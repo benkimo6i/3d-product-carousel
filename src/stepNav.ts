@@ -7,8 +7,16 @@ import { detailLayout } from './three/detailFraming'
 
 gsap.registerPlugin(ScrollToPlugin)
 
-/** Duration of one product-to-product move (matches the approved Blender timing). */
+/** Duration of one paddle step, product to product (matches the approved Blender timing). */
 const STEP_DURATION = 1.0
+/** Scrolling scrubs the row freely; once it stops this close to a product (share of the gap), it snaps. */
+const SNAP_ZONE = 0.25
+/**
+ * The snap starts from rest (it waits for scrolling to stop), so it eases in as well as out: an
+ * ease-out alone would jump straight to full speed and feel jerky.
+ */
+const SNAP_DURATION = 0.5
+const SNAP_EASE = 'sine.inOut'
 /** Wheel deltas below this are treated as noise. */
 const MIN_DELTA = 4
 /** A pause this long between wheel events always starts a new gesture. */
@@ -19,10 +27,10 @@ const FIRM_DELTA = 24
 /** A delta this much stronger than the previous one is a fresh flick, not a decaying momentum tail. */
 const RISE_FACTOR = 1.4
 const SWIPE_MIN_PX = 40
+/** Touch: movement before a carousel swipe commits to an axis (scrub sideways, or scroll natively). */
+const TOUCH_AXIS_PX = 8
 /** A move redirected mid-slide is already travelling, so it eases out only, a little quicker. */
 const CHAIN_DURATION = 0.8
-/** No new gesture is that quick: input this soon after a move starts is the same gesture. */
-const CHAIN_MIN_MS = 250
 /** A wheel gesture counts as decaying once its deltas drop below this share of its peak. */
 const DECAY_SHARE = 0.5
 /** Wheel travel (px) a gesture needs before its axis is decided, so faint drift can't decide it. */
@@ -50,7 +58,6 @@ let failsafe: ReturnType<typeof setTimeout> | undefined
 /** Slot the current move is heading to; `moveId` tells a superseded move's callbacks apart. */
 let moveTarget = 0
 let moveId = 0
-let moveStart = 0
 /** Product the page rests on, captured before a layout refresh rewrites progress (see onRefresh). */
 let restSlot: number | null = null
 /** A refresh landed mid-move; realign once the move finishes. */
@@ -63,6 +70,14 @@ function slotY(slot: number) {
   return trigger.start + ((trigger.end - trigger.start) * slot) / (slotCount() - 1)
 }
 
+/** Where the row is, in products (fractional between them), or null when the carousel isn't on screen. */
+function currentPosition(): number | null {
+  if (!trigger) return null
+  const y = window.scrollY
+  if (y < trigger.start - 1 || y > trigger.end + 1) return null
+  return ((y - trigger.start) / (trigger.end - trigger.start)) * (slotCount() - 1)
+}
+
 /** Slot the page is currently at, or null when the carousel isn't pinned on screen. */
 function currentSlot(): number | null {
   if (!trigger) return null
@@ -71,19 +86,25 @@ function currentSlot(): number | null {
   return Math.round(((y - trigger.start) / (trigger.end - trigger.start)) * (slotCount() - 1))
 }
 
+interface MoveOptions {
+  /** Redirect a move already under way instead of ignoring the call. */
+  chain?: boolean
+  /** Snap: a short, gentle glide over the last stretch. */
+  snap?: boolean
+}
+
 /**
- * Slides the carousel to `slot`. With `chain`, a move already under way is redirected there (a new
- * gesture mid-slide carries on to the following product instead of being dropped); otherwise the
- * call is ignored while a move is running.
+ * Moves the carousel to `slot`. A paddle step slides the full second; with `chain`, a move already
+ * under way is redirected there (clicking again mid-slide carries on to the following product);
+ * otherwise the call is ignored while a move is running.
  */
-export function goToSlot(slot: number, { chain = false } = {}) {
+export function goToSlot(slot: number, { chain = false, snap = false }: MoveOptions = {}) {
   if (!trigger || (animating && !chain)) return
   const target = Math.max(0, Math.min(slotCount() - 1, slot))
   if (animating && target === moveTarget) return
   const redirect = animating
   const id = ++moveId
   moveTarget = target
-  moveStart = performance.now()
   animating = true
   armed = false
   const done = () => {
@@ -98,18 +119,23 @@ export function goToSlot(slot: number, { chain = false } = {}) {
       alignToSlot(target, 0)
     }
   }
-  const duration = (redirect ? CHAIN_DURATION : STEP_DURATION) * motionScale()
+  const duration = (snap ? SNAP_DURATION : redirect ? CHAIN_DURATION : STEP_DURATION) * motionScale()
   // If the tween is ever interrupted, never leave the carousel locked.
   clearTimeout(failsafe)
   failsafe = setTimeout(done, duration * 1000 + 400)
   gsap.to(window, {
     scrollTo: { y: slotY(target), autoKill: false },
     duration,
-    ease: redirect ? 'power2.out' : 'power2.inOut',
+    ease: snap ? SNAP_EASE : redirect ? 'power2.out' : 'power2.inOut',
     overwrite: true,
     onComplete: done,
     onInterrupt: done,
   })
+}
+
+/** The visitor scrolls (or swipes) while a paddle step or snap is moving: hand control back to them. */
+function yieldToScroll() {
+  if (animating) gsap.killTweensOf(window)
 }
 
 /**
@@ -125,46 +151,40 @@ export function alignToSlot(slot: number, duration: number) {
   else gsap.to(window, { scrollTo: { y, autoKill: false }, duration, ease: 'power2.inOut' })
 }
 
-/** Paddles: one product either way; clicking again mid-slide carries on to the next one. */
+/**
+ * Paddles: to the next product in that direction (from a rest between two products, the one ahead,
+ * not the one after the nearest); clicking again mid-slide carries on to the following one.
+ */
 export function step(dir: 1 | -1) {
   if (animating) {
     goToSlot(moveTarget + dir, { chain: true })
     return
   }
-  const s = currentSlot()
-  if (s === null) return
-  goToSlot(s + dir)
+  const pos = currentPosition()
+  if (pos === null) return
+  goToSlot(dir > 0 ? Math.floor(pos + 1e-3) + 1 : Math.ceil(pos - 1e-3) - 1)
 }
 
 /**
- * Decides what a scroll or swipe gesture should do (vertical and horizontal alike: one gesture, one
- * product). Returns true if it was consumed by the carousel.
+ * Carousel: scrolling scrubs the row (the page scroll drives it 1:1). Vertical input scrolls the
+ * page natively; sideways input is converted to the same scroll distance, kept inside the carousel
+ * so it never carries the page past it. Once scrolling stops, maybeSnap() finishes the move if the
+ * row is close to a product.
  */
-function handleGesture(dir: 1 | -1, deltaPx: number, horizontal = false): boolean {
-  if (!trigger || useStore.getState().mode !== 'carousel') return false
-  const y = window.scrollY
-  // Entering from the hero above / footer below: lock into the first / last product.
-  if (!horizontal && dir > 0 && y < trigger.start - 1 && y + deltaPx > trigger.start) {
-    goToSlot(0)
-    return true
-  }
-  if (!horizontal && dir < 0 && y > trigger.end + 1 && y + deltaPx < trigger.end) {
-    goToSlot(slotCount() - 1)
-    return true
-  }
-  const s = currentSlot()
-  if (s === null) return false
-  // A new gesture mid-slide carries the move on (momentum from the same gesture isn't armed).
-  if (animating) {
-    if (armed && performance.now() - moveStart > CHAIN_MIN_MS) goToSlot(moveTarget + dir, { chain: true })
-    armed = false
-    return true
-  }
-  // At either end, vertical scrolling carries on past the carousel; sideways swipes just stop.
-  if ((s === 0 && dir < 0) || (s === slotCount() - 1 && dir > 0)) return horizontal
-  if (!armed) return true
-  goToSlot(s + dir)
-  return true
+function scrubSideways(deltaPx: number) {
+  if (!trigger) return
+  yieldToScroll()
+  window.scrollTo(0, Math.min(trigger.end, Math.max(trigger.start, window.scrollY + deltaPx)))
+}
+
+/** Within SNAP_ZONE of a product, glide the last stretch onto it; further out, stay put. */
+function maybeSnap() {
+  if (animating || touching || !trigger || useStore.getState().mode !== 'carousel') return
+  const pos = currentPosition()
+  if (pos === null) return
+  const nearest = Math.round(pos)
+  const off = Math.abs(pos - nearest)
+  if (off <= SNAP_ZONE && Math.abs(window.scrollY - slotY(nearest)) > 1) goToSlot(nearest, { snap: true })
 }
 
 /**
@@ -185,8 +205,12 @@ function scrollDetailCopy(e: WheelEvent, delta: number) {
 function onWheel(e: WheelEvent) {
   const now = performance.now()
   const mode = useStore.getState().mode
-  // Normalise line/page wheel modes (some mice, Firefox) to pixels. Sideways trackpad swipes count
-  // as gestures too (towards the next product when the fingers move left).
+  if (mode === 'carousel') {
+    onCarouselWheel(e)
+    return
+  }
+  // Details from here on. Normalise line/page wheel modes (some mice, Firefox) to pixels. Sideways
+  // trackpad swipes switch products (towards the next one when the fingers move left).
   const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1
   const quiet = now - lastWheel > QUIET_MS
   if (quiet) {
@@ -199,11 +223,9 @@ function onWheel(e: WheelEvent) {
     if (Math.max(gestureTravel.x, gestureTravel.y) >= AXIS_LOCK_PX) {
       gestureAxis = gestureTravel.x > gestureTravel.y ? 'x' : 'y'
     } else {
-      // Too little movement to tell the axis yet: hold the page still inside the carousel.
+      // Too little movement to tell the axis yet (details): hold still, except native copy scrolling.
       lastWheel = now
-      if (mode !== 'carousel' || currentSlot() !== null) {
-        if (mode !== 'detail' || Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault()
-      }
+      if (mode !== 'detail' || Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.preventDefault()
       return
     }
   }
@@ -244,24 +266,42 @@ function onWheel(e: WheelEvent) {
     }
     return
   }
-  if (mode !== 'carousel') return
-  if (abs < MIN_DELTA) {
-    // Inside the carousel, small deltas (and sideways ones, which would trigger browser history
-    // swipes) never move the page.
-    const inside = currentSlot() !== null && trigger && window.scrollY > trigger.start && window.scrollY < trigger.end
-    if (inside || (horizontal && currentSlot() !== null)) e.preventDefault()
-    return
+}
+
+/** Carousel wheel: vertical scrolls the page natively; sideways scrubs (towards the next product when
+ *  the fingers move left). Either one takes over from a paddle step or snap in progress. */
+function onCarouselWheel(e: WheelEvent) {
+  if (currentPosition() === null) return
+  const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+    // Also stops the browser treating it as a back/forward swipe.
+    e.preventDefault()
+    scrubSideways(e.deltaX * unit)
+  } else {
+    yieldToScroll()
   }
-  if (handleGesture(dir, delta, horizontal)) e.preventDefault()
 }
 
 let touchY: number | null = null
 let touchX: number | null = null
+/** Carousel touch: a finger is down (no snapping under it), and the axis its swipe committed to. */
+let touching = false
+let touchAxis: 'x' | 'y' | null = null
+let lastScroll = 0
 function onTouchStart(e: TouchEvent) {
   touchY = e.touches[0].clientY
   touchX = e.touches[0].clientX
-  // Every new touch is a new gesture, so it can also carry on a slide that's still moving.
+  touching = true
+  touchAxis = null
+  // Every new touch is a new gesture.
   armed = true
+}
+function onTouchEnd() {
+  touching = false
+  // If the page is still gliding (momentum), scrollEnd will snap; otherwise check now.
+  setTimeout(() => {
+    if (performance.now() - lastScroll > 120) maybeSnap()
+  }, 150)
 }
 function onTouchMove(e: TouchEvent) {
   if (touchY === null) return
@@ -279,32 +319,30 @@ function onTouchMove(e: TouchEvent) {
     }
     return
   }
-  if (mode !== 'carousel') return
-  // A clearly sideways swipe steps like a vertical one (finger moving left → next product).
-  const dx = touchX === null ? 0 : touchX - e.touches[0].clientX
-  if (Math.abs(dx) > Math.abs(touchY - e.touches[0].clientY) * 1.5) {
-    if (currentSlot() !== null) e.preventDefault()
-    if (Math.abs(dx) > SWIPE_MIN_PX && armed && handleGesture(dx > 0 ? 1 : -1, dx, true)) {
-      touchX = null
-      touchY = null
-    }
-    return
+  if (mode !== 'carousel' || touchX === null) return
+  const x = e.touches[0].clientX
+  const y = e.touches[0].clientY
+  // Commit to an axis first: vertical swipes scroll the page natively, sideways ones scrub.
+  if (touchAxis === null) {
+    if (Math.max(Math.abs(x - touchX), Math.abs(y - touchY)) < TOUCH_AXIS_PX) return
+    touchAxis = Math.abs(x - touchX) > Math.abs(y - touchY) ? 'x' : 'y'
+    if (touchAxis === 'y') yieldToScroll()
   }
-  const dy = touchY - e.touches[0].clientY
-  const s = currentSlot()
-  const atEdge = s !== null && ((s === 0 && dy < 0) || (s === slotCount() - 1 && dy > 0))
-  // Inside the carousel, the finger doesn't scroll the page; the release decides the step.
-  if (s !== null && !atEdge) e.preventDefault()
-  if (Math.abs(dy) > SWIPE_MIN_PX && armed && handleGesture(dy > 0 ? 1 : -1, dy)) touchY = null
+  if (touchAxis === 'x' && currentPosition() !== null) {
+    e.preventDefault()
+    scrubSideways(touchX - x)
+  }
+  touchX = x
+  touchY = y
 }
 
-/** Anything that leaves the page between products (scrollbar drag, keyboard) eases to the nearest one. */
+/** Scrolling has stopped (momentum included): snap if the row came to rest close to a product. */
 function onScrollEnd() {
-  if (animating || !trigger || useStore.getState().mode !== 'carousel') return
-  const y = window.scrollY
-  if (y <= trigger.start + 1 || y >= trigger.end - 1) return
-  const s = currentSlot()
-  if (s !== null && Math.abs(y - slotY(s)) > 2) goToSlot(s)
+  maybeSnap()
+}
+
+function onScroll() {
+  lastScroll = performance.now()
 }
 
 /** The product the page should rest on: the open product in details, otherwise the nearest. */
@@ -357,11 +395,15 @@ export function attachStepNav(st: ScrollTrigger, scrollTriggerClass: typeof Scro
       start: trigger?.start,
       end: trigger?.end,
       slot: currentSlot(),
+      position: currentPosition(),
     })
   }
   window.addEventListener('wheel', onWheel, { passive: false })
   window.addEventListener('touchstart', onTouchStart, { passive: true })
   window.addEventListener('touchmove', onTouchMove, { passive: false })
+  window.addEventListener('touchend', onTouchEnd, { passive: true })
+  window.addEventListener('touchcancel', onTouchEnd, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
   scrollTriggerClass.addEventListener('scrollEnd', onScrollEnd)
   return () => {
     trigger = null
@@ -370,6 +412,9 @@ export function attachStepNav(st: ScrollTrigger, scrollTriggerClass: typeof Scro
     window.removeEventListener('wheel', onWheel)
     window.removeEventListener('touchstart', onTouchStart)
     window.removeEventListener('touchmove', onTouchMove)
+    window.removeEventListener('touchend', onTouchEnd)
+    window.removeEventListener('touchcancel', onTouchEnd)
+    window.removeEventListener('scroll', onScroll)
     scrollTriggerClass.removeEventListener('scrollEnd', onScrollEnd)
   }
 }
