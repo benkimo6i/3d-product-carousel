@@ -24,8 +24,8 @@ function Hero() {
   const mode = useStore((s) => s.mode)
   return (
     <section className="hero" inert={mode !== 'carousel'}>
-      <h1>The lineup.</h1>
-      <p>Every device, front and centre. Scroll to explore.</p>
+      <h1>Product Showcase Carousel</h1>
+      <p>Every device, front and center. Scroll to explore.</p>
       <span className="hero-cue" aria-hidden>
         ↓
       </span>
