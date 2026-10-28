@@ -1,0 +1,691 @@
+:root {
+  --bg: #ededef;
+  --ink: #1d1d1f;
+  /* Both stay at 4.5:1 or better on the darkest part of the stage (WCAG AA body text). */
+  --grey: #636366;
+  --link: #0060c0;
+  --nav-h: 44px;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Read by screen readers, never shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--link);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 17px;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- nav ---------- */
+.top-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--nav-h);
+  z-index: 50;
+  background: rgba(237, 237, 239, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  transition: opacity 0.4s;
+}
+.top-nav.dim {
+  opacity: 0;
+  pointer-events: none;
+}
+.nav-inner {
+  max-width: 1000px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.nav-inner a {
+  color: var(--ink);
+  opacity: 0.8;
+  text-decoration: none;
+}
+.nav-inner a:hover {
+  opacity: 1;
+}
+.nav-logo {
+  font-size: 14px;
+}
+
+/* ---------- hero / footer ---------- */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+}
+.hero h1 {
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.hero p {
+  font-size: clamp(19px, 2vw, 24px);
+  color: var(--grey);
+  margin: 12px 0 0;
+}
+.hero-cue {
+  margin-top: 48px;
+  font-size: 22px;
+  color: var(--grey);
+  animation: cue 1.8s ease-in-out infinite;
+}
+@keyframes cue {
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.site-footer {
+  padding: 64px 22px 80px;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-size: 12px;
+  color: var(--grey);
+  border-top: 1px solid #d2d2d7;
+}
+.site-footer .footer-heading {
+  color: var(--ink);
+  font-size: 1em;
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+.site-footer ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.7;
+}
+
+/* ---------- carousel section ---------- */
+.carousel-section {
+  position: relative;
+}
+.carousel-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+.carousel-canvas {
+  position: absolute !important;
+  inset: 0;
+  touch-action: pan-y;
+}
+
+.carousel-ui {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Set every frame by LabelAnchor: just under the on-stage product. */
+  top: var(--label-top, 72vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.carousel-ui.visible {
+  opacity: 1;
+  transform: none;
+}
+.carousel-ui.visible > * {
+  pointer-events: auto;
+}
+.product-label {
+  text-align: center;
+  animation: label-in 0.5s ease both;
+}
+.product-label h2 {
+  font-size: 37.76px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+.product-label p {
+  font-size: 17px;
+  color: var(--grey);
+  margin: 6px 0 10px;
+}
+@keyframes label-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- prev / next arrows ---------- */
+.nav-arrows {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.nav-arrows.visible {
+  opacity: 1;
+}
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(210, 210, 215, 0.64);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    opacity 0.25s;
+}
+.nav-arrows.visible .nav-arrow {
+  pointer-events: auto;
+}
+.nav-arrow:hover {
+  background: rgba(200, 200, 205, 0.9);
+}
+.nav-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.nav-arrow svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nav-arrow.prev {
+  left: max(24px, 3vw);
+}
+.nav-arrow.next {
+  right: max(24px, 3vw);
+}
+/* Inline row (mobile): a pair of paddles under the product label, inside the label block. */
+.nav-arrows.inline {
+  inset: auto 0 calc(40px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+.nav-arrows.inline .nav-arrow {
+  position: static;
+  margin: 0;
+}
+/* Desktop: side paddles in both views. Mobile: the inline row in the carousel and no paddles in
+   details (swiping switches products there). */
+@media (min-width: 769px) {
+  .nav-arrows.inline {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .nav-arrows.sides {
+    display: none;
+  }
+}
+
+/* ---------- size toggle ---------- */
+.size-toggle {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+}
+.size-toggle button {
+  position: relative;
+  z-index: 1;
+  min-width: 64px;
+  padding: 7px 16px;
+  border: 0;
+  background: none;
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--grey);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.size-toggle button.active {
+  color: var(--ink);
+}
+.size-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+/* ---------- details overlay (print-ad layout) ---------- */
+.detail-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  font-size: clamp(12px, 1.05vw, 16px);
+}
+.detail-overlay.visible {
+  opacity: 1;
+  transition: none;
+}
+/* Entrance: each group fades and rises in turn (delays set inline via --d); exits fade together. */
+.detail-overlay .stagger {
+  opacity: 0;
+  translate: 0 10px;
+  transition:
+    opacity 0.45s ease,
+    translate 0.45s ease;
+}
+.detail-overlay.visible .stagger {
+  opacity: 1;
+  translate: 0 0;
+  transition:
+    opacity 0.7s ease calc(var(--base, 1s) + var(--d, 0s)),
+    translate 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--base, 1s) + var(--d, 0s));
+}
+/* MacBook swap inside details: copy fades out together, then re-staggers as the new machine opens. */
+.detail-overlay.visible.swap-out .stagger:not(.detail-close) {
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.3s ease,
+    translate 0.3s ease;
+}
+/* The hint bows out once the user has dragged the product. */
+.detail-overlay.visible .detail-hint.dismissed {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.detail-overlay.visible .detail-close,
+.detail-overlay.visible .link,
+.detail-overlay.visible .size-toggle {
+  pointer-events: auto;
+}
+/* Copy can be selected; drags that start off the text still rotate the product. */
+.detail-overlay.visible .detail-head h2,
+.detail-overlay.visible .detail-head p,
+.detail-overlay.visible .copy-block,
+.detail-overlay.visible .detail-foot {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+/* Desktop: one max-width block (head, then columns + product), centred vertically. */
+.detail-frame {
+  position: absolute;
+  inset: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  /* On screens too narrow to leave room beside the 1200px block, the sides grow (up to 80px) just
+     enough to clear the nav paddles. */
+  padding: 40px clamp(32px, calc(80px - (100vw - 1200px) / 2), 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(28px, 4vh, 48px);
+}
+.detail-head {
+  text-align: center;
+}
+.detail-head h2 {
+  font-size: clamp(36px, 5.3vw, 80px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.05;
+}
+.detail-head p {
+  font-size: clamp(18px, 1.92vw, 28.8px);
+  margin: 0.6em 0 0;
+}
+.detail-toggle {
+  margin-top: 0.9em;
+}
+.detail-sheet {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  /* The footnote runs full width under the columns, so growing copy pushes it down, never under it. */
+  grid-template-areas:
+    'left stage right'
+    'foot foot foot';
+  column-gap: clamp(24px, 3vw, 48px);
+  row-gap: clamp(12px, 2.5vh, 28px);
+  align-items: start;
+}
+.detail-col.left {
+  grid-area: left;
+}
+.detail-col.right {
+  grid-area: right;
+}
+/* The product is framed into this slot; its height comes from the product (set by the camera rig). */
+.detail-stage {
+  grid-area: stage;
+  min-height: var(--stage-h, 40vh);
+}
+.copy-block {
+  margin-bottom: 2.4em;
+}
+/* Copy matches the CTA links (17px); titles are 15% larger. */
+.copy-block h3 {
+  font-size: 19.55px;
+  font-weight: 600;
+  margin: 0 0 0.35em;
+  letter-spacing: -0.005em;
+}
+.copy-block p {
+  font-size: 17px;
+  margin: 0;
+  color: var(--grey);
+  line-height: 1.45;
+}
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 20px;
+  margin-top: 0.8em;
+}
+/* Each link (text + chevron) stays on one line; in a tight column the links wrap as whole units. */
+.cta-actions .link {
+  white-space: nowrap;
+}
+/* Full container width under the columns, starting where the left column starts. */
+.detail-foot {
+  grid-area: foot;
+  text-align: left;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--grey);
+}
+.detail-close {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.07);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.detail-close svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.detail-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- details: stacked mobile layout ---------- */
+@media (max-width: 768px) {
+  .detail-overlay {
+    font-size: 15px;
+  }
+  .detail-frame {
+    display: contents;
+  }
+  .detail-head {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--nav-h) + 8px);
+    /* Same inline padding as the copy sheet, so head and copy start on the same line. */
+    padding: 0 20px;
+    text-align: left;
+  }
+  .detail-head h2 {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+  .detail-head p {
+    font-size: 18px;
+  }
+  .detail-close {
+    top: 14px;
+    right: 14px;
+  }
+  .detail-sheet {
+    position: absolute;
+    top: 63%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    /* Top runway: blocks start below the edge and fade out as they scroll up to it. */
+    padding: 76px 20px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'left right'
+      'foot foot';
+    grid-template-rows: auto;
+    column-gap: 20px;
+    align-content: start;
+  }
+  .detail-stage {
+    display: none;
+  }
+  .detail-overlay.visible .detail-sheet {
+    pointer-events: auto;
+  }
+  .detail-col,
+  .detail-col.left,
+  .detail-col.right {
+    position: static;
+    width: auto;
+  }
+  .copy-block {
+    margin-bottom: 1.6em;
+    will-change: opacity;
+  }
+  .detail-foot {
+    margin-top: 8px;
+  }
+}
+/* Phones: the copy columns stack into one. */
+@media (max-width: 480px) {
+  .detail-sheet {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'left'
+      'right'
+      'foot';
+  }
+}
+/* ---------- details: stacked layouts (in-between + mobile) share these ---------- */
+@media (max-width: 1100px) {
+  /* The scrolling copy hides its scrollbar; the edge fades show there's more. */
+  .detail-sheet {
+    scrollbar-width: none;
+  }
+  .detail-sheet::-webkit-scrollbar {
+    display: none;
+  }
+  /* The CTA moves into the head, left aligned with it. */
+  .detail-head-cta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    margin-top: 14px;
+  }
+  .detail-head-cta .cta-actions {
+    margin-top: 0;
+  }
+  .detail-overlay.visible .detail-head-cta {
+    pointer-events: auto;
+  }
+  .detail-sheet .copy-block.cta {
+    display: none;
+  }
+  .copy-block {
+    will-change: opacity;
+  }
+  /* No paddles in details here: keys and swipes switch products. */
+  .nav-arrows.sides.in-detail {
+    display: none;
+  }
+}
+@media (min-width: 1101px) {
+  .detail-head-cta {
+    display: none;
+  }
+  /* If the copy ever outgrows the screen, the block scrolls (top-aligned, so nothing is cut off). */
+  .detail-frame {
+    justify-content: safe center;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+  .detail-frame::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- details: in-between layout (head on top, copy column left, product right) ---------- */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .detail-frame {
+    padding: 40px 0 0;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  .detail-head {
+    text-align: left;
+    /* Same inline padding as the copy column; extra on the right clears the close button. */
+    padding: 0 72px 0 40px;
+  }
+  .detail-sheet {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 40%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Runways top and bottom (≥ the 72px fade), so copy is fully visible at rest and fades in and
+       out at the column's edges as it scrolls. */
+    padding: 76px 40px 76px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'left'
+      'right'
+      'foot';
+    row-gap: 0;
+  }
+  .detail-overlay.visible .detail-sheet {
+    pointer-events: auto;
+  }
+  .detail-stage {
+    display: none;
+  }
+  /* The hint centres under the product, in the area right of the copy column. */
+  .detail-overlay .detail-hint {
+    left: 40%;
+    right: 0;
+  }
+}
+
+.detail-hint {
+  position: absolute;
+  /* Set every frame by LabelAnchor: just under the product. */
+  top: var(--hint-top, 84%);
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  color: var(--grey);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- reduced motion: copy appears without rising or staggering (the 3D moves are shortened
+   in script, see motionScale) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .detail-overlay .stagger,
+  .detail-overlay.visible .stagger,
+  .detail-overlay.visible.swap-out .stagger:not(.detail-close) {
+    translate: none;
+    transition-duration: 0.2s;
+    transition-delay: 0s;
+  }
+  .carousel-ui,
+  .carousel-ui.visible {
+    transform: none;
+  }
+  .product-label {
+    animation: none;
+  }
+}
