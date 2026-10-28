@@ -1,5 +1,7 @@
 # 3D product carousel
 
+**Live demo: https://benkimo6i.github.io/3d-product-carousel/**
+
 A scroll-driven 3D product carousel (React Three Fiber, GSAP). Scroll, swipe or use the paddles to
 step through the lineup; open any product for a rotatable details view.
 
