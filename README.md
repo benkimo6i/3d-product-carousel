@@ -2,9 +2,7 @@
 
 **Live demo: https://benkimo6i.github.io/3d-product-carousel/**
 
-<!-- Preview GIF goes here once recorded:
-![Scrolling through the carousel, switching MacBook sizes and opening a product's details view](docs/media/preview.gif)
--->
+![Scrolling through the carousel, switching MacBook sizes, opening the details view and dragging the product](docs/media/preview.gif)
 
 A scroll-driven 3D product carousel in the style of a modern product page. Scroll or swipe through
 the lineup, open any product for a print-ad-style details view, and drag to turn it in your hands.
@@ -61,9 +59,10 @@ Blender and optimised with [glTF Transform](https://gltf-transform.dev/) and
 
 ## How it was made
 
-I art-directed and designed the piece, and built it with Claude Code as my hands-on collaborator:
-in Blender through MCP for Blender for the 3D scene, and in the codebase for the web build, checking
-every change in the browser along the way. The [case study](docs/case-study.md) walks through the
+I set the creative direction and designed the experience (the look, the layouts and how it moves),
+and built it with Claude Code doing the hands-on work under my direction: in Blender through MCP for
+Blender for the 3D scene, and in the codebase for the web build, checking every change in the browser
+along the way. The [case study](docs/case-study.md) walks through the
 art direction, the Blender setup, the React Three Fiber architecture and how we debugged it.
 
 <table>

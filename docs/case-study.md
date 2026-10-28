@@ -3,9 +3,10 @@
 **Live demo: https://benkimo6i.github.io/3d-product-carousel/** · [Back to the README](../README.md)
 
 I wanted a portfolio piece that felt like a modern product launch page, but with real 3D: a row of
-products you scroll through, each one opening into a details view you can pick up and turn. I
-art-directed and designed it, and built it with Claude Code as my hands-on collaborator, first in
-Blender (through the Blender MCP) to set up the scene, then in the codebase for the web build.
+products you scroll through, each one opening into a details view you can pick up and turn. I set
+the creative direction and designed the experience (the look, the layouts and how it moves), and
+built it with Claude Code doing the hands-on work under my direction, first in Blender (through MCP
+for Blender) to set up the scene, then in the codebase for the web build.
 
 This is how it came together: the art direction, the Blender setup, why I built it on React Three
 Fiber, and what working and debugging with Claude actually looked like.
