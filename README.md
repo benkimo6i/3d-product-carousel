@@ -15,11 +15,11 @@ Product names and copy are placeholders; not affiliated with Apple.
 
 - **Scrub-and-snap carousel**: scrolling or swiping moves the row directly; let go near a product
   and it glides into place.
-- **Details view**: the camera arcs round to a front-on view with headline and copy laid out around
+- **Details view**: the camera arcs around to a front-on view with headline and copy laid out around
   the product. Drag to rotate it freely; on release it settles into the nearest good angle.
 - **Switch products in place**: step to the next product without leaving the details view.
-- **MacBook Pro 14"/16" toggle**: the lid closes, the machines crossfade, the other lid opens, at
-  their real relative sizes.
+- **MacBook Pro 14"/16" toggle**: the open lid closes, the machines crossfade and the other lid
+  opens, shown at their real relative sizes.
 - **Responsive layouts**: a three-column print-ad layout on desktop, product beside a scrolling copy
   column on tablets, and a stacked layout on phones.
 - **Accessible**: keyboard and screen-reader friendly (details is a proper modal dialog), AA
@@ -40,14 +40,14 @@ Product names and copy are placeholders; not affiliated with Apple.
 React 19, [React Three Fiber](https://r3f.docs.pmnd.rs/) and [drei](https://drei.docs.pmnd.rs/) on
 three.js, [GSAP](https://gsap.com/) (ScrollTrigger, ScrollTo) for scroll and timelines,
 [zustand](https://zustand.docs.pmnd.rs/) for state, Vite and TypeScript. Models were prepared in
-Blender and optimised with [glTF Transform](https://gltf-transform.dev/) and
+Blender and optimized with [glTF Transform](https://gltf-transform.dev/) and
 [KTX-Software](https://github.com/KhronosGroup/KTX-Software).
 
 ### Why React Three Fiber
 
 Compared with building it in plain three.js:
 
-- **Organisation**: the scene is components (`<Stage>`, `<Carousel>`, `<Product>`, `<CameraRig>`),
+- **Organization**: the scene is components (`<Stage>`, `<Carousel>`, `<Product>`, `<CameraRig>`),
   each owning its own state and per-frame logic, alongside ordinary HTML/CSS for the copy and
   controls.
 - **Scalability and flexibility**: the carousel is data-driven from a JSON manifest, and each product
@@ -63,7 +63,7 @@ Compared with building it in plain three.js:
   just animate the page scroll.
 - **One camera, two poses.** The camera orbits a target in spherical coordinates, so moving between
   the carousel and a details view is an arc around the product rather than a straight dolly.
-- **Layout-driven framing.** The details layout is plain HTML/CSS. Each frame the camera reads where
+- **Layout-driven framing.** The details layout is plain HTML/CSS. Each frame, the camera reads where
   the layout leaves room for the product, then sizes and shifts the shot to fit it, so the 3D
   product always sits in its slot at any screen size.
 - **Render on demand.** The canvas only draws while something moves (scrolling, a tween, a drag),
@@ -78,8 +78,8 @@ The idea grew out of conversations with colleagues about the future of web UI, a
 computer print ad that showed me a way to bring it to life. I set the creative direction and designed
 the experience (the look, the layouts and how it moves), and built it with Claude Code doing the
 hands-on work under my direction. My background is in engineering, so MCP for Blender was what made
-the 3D side possible: Claude drove Blender to build the scene while I directed it, then built the web
-app in the codebase, checking every change in the browser along the way.
+the 3D side possible: Claude drove Blender to build the scene under my direction, and then built the
+web app in the codebase, checking every change in the browser along the way.
 
 The [case study](docs/case-study.md) covers the art direction, the Blender setup, why React Three
 Fiber, how we debugged it, and where I think this way of working is heading.
@@ -87,7 +87,7 @@ Fiber, how we debugged it, and where I think this way of working is heading.
 <table>
   <tr>
     <td width="55%" valign="top">
-      <a href="docs/case-study.md#art-direction"><img src="docs/media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad with a large headline, the computer front-on in the centre and copy columns either side"></a>
+      <a href="docs/case-study.md#art-direction"><img src="docs/media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad with a large headline, the computer front-on in the center and copy columns on either side"></a>
       <br><sub><b>Art direction:</b> the details view borrows its layout from a vintage print ad
       (Heathkit H89, Heath Company, c. 1979).</sub>
     </td>
@@ -121,7 +121,7 @@ sources aren't part of this repo.
 
 ## Credits & licenses
 
-3D models from Sketchfab, used under their creators' licenses (reshaded and optimised for this
+3D models from Sketchfab, used under their creators' licenses (reshaded and optimized for this
 demo):
 
 | Model | Author | License |

@@ -10,7 +10,7 @@ more object**, so that what's left to design is the experience itself: the objec
 feel.
 
 I found a way into that idea in an unexpected place: a vintage computer print ad, with the product
-dead centre and the copy arranged around it like a magazine spread. I wanted to bring that picture
+dead center and the copy arranged around it like a magazine spread. I wanted to bring that picture
 in my head to life: a row of products you scroll through, each one opening into a print-ad-style
 details view where you can pick the product up and turn it.
 
@@ -28,17 +28,17 @@ The direction came down to one idea: **nostalgia helps sell**. A familiar, sligh
 composition makes people slow down and look, and pairing it with a crisp modern aesthetic keeps it
 from feeling like a pastiche. So two references shaped the look, one old and one new.
 
-**Modern Apple product pages** set the tone for the carousel: a quiet light-grey stage, big confident
-type, one product in focus with its neighbours peeking in at the edges, small round paddles, and
+**Modern Apple product pages** set the tone for the carousel: a quiet light-gray stage, big confident
+type, one product in focus with its neighbors peeking in at the edges, small round paddles, and
 understated "Explore" links. Everything else stays out of the way of the product.
 
 **A vintage computer print ad** set the layout of the details view. I loved how it puts the product
-dead centre, front-on, with a huge headline above it and short copy blocks arranged around it in
+dead center, front-on, with a huge headline above it and short copy blocks arranged around it in
 columns, more like a magazine spread than a web page. The details view borrows exactly that
-structure, rebuilt in a modern style: no blue-grey paper or period type, just the composition.
+structure, rebuilt in a modern style: no blue-gray paper or period type, just the composition.
 
 <p align="center">
-  <img src="media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad: a large 'no loose ends' headline, the computer front-on in the centre, and copy columns on either side" width="560">
+  <img src="media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad: a large 'no loose ends' headline, the computer front-on in the center, and copy columns on either side" width="560">
   <br>
   <sub>Layout reference: Heathkit H89 All-In-One Computer advertisement, Heath Company (c. 1979).</sub>
 </p>
@@ -48,13 +48,13 @@ A few decisions followed from those references:
 - **One consistent set.** The products come from different Sketchfab artists, so they were reshaded
   with a shared material library (finishes, glass, satin and matte blacks, emissive screens) so they
   read as one family under one light.
-- **Normalised sizes.** A Watch next to an iMac at real scale would be a speck. Every product is
+- **Normalized sizes.** A Watch next to an iMac at real scale would be a speck. Every product is
   scaled to fill about the same space on the stage, except the two MacBook Pros, which keep their
   real relative sizes because comparing them is the point of the toggle.
 - **A fixed camera.** The carousel camera never moves between products; the row slides under it.
   That makes switching feel like a single continuous object rather than a sequence of shots.
 - **Copy that frames the product.** Placeholder, Apple-style copy, written to the shape of the
-  layout: a headline, a one-line subline and three short blocks a side.
+  layout: a headline, a one-line subline and three short blocks on each side.
 
 ## Setting up the scene: Claude + MCP for Blender
 
@@ -63,10 +63,10 @@ export pipelines are a craft of their own, and on my own this is where the proje
 likely have stalled. [MCP for Blender](https://mcp-for-blender.com/) changed that: it lets Claude
 drive a live Blender session, so I could direct the 3D work the way I'd direct a 3D artist, while
 Claude did the hands-on Blender work. It augmented the design and rendering side I don't
-specialise in.
+specialize in.
 
-Before writing any web code I wanted the 3D assets right, so the first phase happened entirely in
-Blender. I described what I wanted, Claude wrote and ran the Blender Python, and showed me viewport
+Before writing any web code, I wanted the 3D assets right, so the first phase happened entirely in
+Blender. I described what I wanted, Claude wrote and ran the Blender Python and showed me viewport
 renders to review. Then I gave notes and we went again.
 
 - **Importing and auditing.** I picked free models on Sketchfab. Claude imported them, put each in
@@ -76,7 +76,7 @@ renders to review. Then I gave notes and we went again.
   only the textures that carry real detail: keycaps, the Watch band, speaker grilles. Screens became
   emission-only so they glow the same everywhere.
 - **Layout, camera and light.** The products went into a row on a seamless sweep with a 70mm-style
-  camera from the front-left (38° round, 22° down) and a soft key spotlight. I reviewed renders and
+  camera from the front-left (38° around, 22° down) and a soft key spotlight. I reviewed renders and
   adjusted spacing, the iPhone's lean and the MacBook pairing until the composition held.
 - **Rigging the MacBooks.** Each MacBook's lid was split into its own part with a hinge pivot, and
   the hinge angles were checked through the full swing so the lid never dips into the keyboard.
@@ -90,12 +90,12 @@ renders to review. Then I gave notes and we went again.
 
 ## Building it: why React Three Fiber
 
-This piece is half 3D scene and half web page, and
-[React Three Fiber](https://r3f.docs.pmnd.rs/) (R3F) lets both live in one React app. It's a
+This piece is half 3D scene and half web page, and [React Three Fiber](https://r3f.docs.pmnd.rs/)
+(R3F) lets both live in one React app. It's a
 React renderer for three.js: the same engine underneath, but the scene is written as components.
 Compared with building it in plain three.js, that paid off in three ways.
 
-**Code and component organisation.** In plain three.js, a scene like this is one long imperative
+**Code and component organization.** In plain three.js, a scene like this is one long imperative
 setup: create a renderer, a scene, cameras, lights and loaders, add and remove objects by hand, wire
 up a render loop and raycasting, and remember to dispose of everything. In R3F the scene reads like
 the page it is part of: a `<Stage>`, a `<Carousel>`, a `<Product>` per item, a `<CameraRig>`. Each
@@ -106,11 +106,11 @@ canvas, which keeps them accessible, selectable and responsive.
 
 **Scalability and flexibility.** The carousel is data-driven: products, their order, cameras and
 per-product settings come from a JSON manifest, and the scene maps over it. Adding a product is a
-manifest entry, its model files and its copy, not new scene code. React features carry straight over to 3D:
-each product loads behind its own `Suspense` boundary (so products stream in independently and one
+manifest entry, its model files and its copy, not new scene code. React features carry straight
+over to 3D: each product loads behind its own `Suspense` boundary (so products stream in independently and one
 slow model doesn't block the rest) and its own error boundary (so a broken model fails alone). The
 same component can swap its lightweight carousel model for the full-detail one just by rendering a
-different child. drei adds ready-made loaders and environment lighting, and GSAP and zustand plug in
+different child. The drei library adds ready-made loaders and environment lighting, and GSAP and zustand plug in
 like they would in any React app.
 
 **Performance.** R3F uses the same three.js renderer, so the speed comes from patterns it makes
@@ -121,7 +121,7 @@ easy:
 - Values that change every frame (scroll progress, the details transition, lid angles) live outside
   React and are read in `useFrame`, so animation never re-renders components sixty times a second.
   React state is kept for the slower things: which product is open, which copy is showing.
-- Per-component control made the optimisations local: off-screen products skip their own work,
+- Per-component control made the optimizations local: off-screen products skip their own work,
   phones render at a capped pixel ratio, and each model compiles its shaders and uploads its textures
   as soon as it loads, rather than stuttering the first time it appears.
 
@@ -160,19 +160,19 @@ layout positions, sampling animations frame by frame, and running accessibility 
 Some of the bugs we tracked down along the way:
 
 - **The product that wandered off on resize.** Resizing the window in the details view sometimes
-  left the product off-centre. Reproducing it showed the scroll library recalculating positions
+  left the product off-center. Reproducing it showed the scroll library recalculating positions
   after the page height changed and quietly moving the carousel to a different product. The fix
-  remembers which product was open before the layout refresh and returns to it afterwards.
+  remembers which product was open before the layout refresh and returns to it afterward.
 - **Scroll-jacking versus scrubbing.** The first carousel moved one product per scroll gesture. It
   worked, but kept needing special cases for trackpad momentum, fast flicks and sideways swipes.
   After trying a scrub mode, I preferred it: scrolling moves the row directly, and it only snaps
   when you stop close to a product. The paddles still step one product at a time.
 - **The snap that fought back.** Sideways swipes felt like a tug-of-war. Simulating a swipe with
-  small hesitations showed the snap starting during a 250ms pause mid-swipe, then being cancelled
+  small hesitations showed the snap starting during a 250ms pause mid-swipe, then being canceled
   by the next movement, over and over. The snap now waits until there has been no input at all
   for 350ms.
 - **Textures that wouldn't compress.** Normal maps came out barely smaller as KTX2. Inspecting the
-  encoder commands showed the build tool silently dropping the compression-optimisation flags, so
+  encoder commands showed the build tool silently dropping the compression-optimization flags, so
   the pipeline now runs that encoding step directly with the right flags.
 - **A stowaway in every model.** Every exported file was bigger than it should have been. A
   second scene used for baking shadows was being exported into every file, with its own copy of a
@@ -184,7 +184,7 @@ Some of the bugs we tracked down along the way:
   any web code meant the web build started from a solid, consistent set rather than fighting seven
   different models.
 - **Let the layout lead.** Making the 3D framing follow the HTML layout, rather than the other way
-  round, made the responsive work far easier.
+  around, made the responsive work far easier.
 - **Verify in the real browser.** Most of the hard bugs only showed up with real scrolling, real
   timing or a real resize. Measuring them in the browser was what made them fixable.
 - **Directing with AI works best with tight loops.** Clear references, annotated screenshots and
@@ -193,7 +193,7 @@ Some of the bugs we tracked down along the way:
 
 ## Where I think this is heading
 
-Building this changed how I think about front-end work. A few years ago a piece like this would
+Building this changed how I think about front-end work. A few years ago, a piece like this would
 have needed a 3D artist, a motion designer and a front-end engineer; here, one engineer directed
 all three disciplines, with AI doing much of the hands-on work. I don't think that replaces those
 specialists, but it does change where the leverage is: in knowing what good looks like, framing the
@@ -204,6 +204,6 @@ agents and conversation, the generic parts of UI (forms, lists, settings screens
 may increasingly be composed on the fly from well-built components. What stays valuable is what
 can't be generated generically: distinctive experiences like this one, and the solid, accessible,
 well-documented building blocks that people and agents assemble from. For front-end developers
-that points towards a blend of engineer, designer and director: building fewer one-off screens and
+that points toward a blend of engineer, designer and director: building fewer one-off screens and
 more of the primitives and experiences everything else is built from. It's a prediction, not a
 certainty, but this project felt like a small preview of it.
