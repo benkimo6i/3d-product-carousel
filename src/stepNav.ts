@@ -17,6 +17,11 @@ const SNAP_ZONE = 0.25
  */
 const SNAP_DURATION = 0.5
 const SNAP_EASE = 'sine.inOut'
+/**
+ * The snap waits for this long with no input at all (wheel on either axis, scroll, touch), so a
+ * hesitation in the middle of a deliberate swipe never starts a snap that the next movement fights.
+ */
+const SNAP_IDLE_MS = 350
 /** Wheel deltas below this are treated as noise. */
 const MIN_DELTA = 4
 /** A pause this long between wheel events always starts a new gesture. */
@@ -177,6 +182,14 @@ function scrubSideways(deltaPx: number) {
   window.scrollTo(0, Math.min(trigger.end, Math.max(trigger.start, window.scrollY + deltaPx)))
 }
 
+let snapTimer: ReturnType<typeof setTimeout> | undefined
+
+/** Input happened: (re)start the idle wait before the snap. */
+function scheduleSnap() {
+  clearTimeout(snapTimer)
+  snapTimer = setTimeout(maybeSnap, SNAP_IDLE_MS)
+}
+
 /** Within SNAP_ZONE of a product, glide the last stretch onto it; further out, stay put. */
 function maybeSnap() {
   if (animating || touching || !trigger || useStore.getState().mode !== 'carousel') return
@@ -272,6 +285,7 @@ function onWheel(e: WheelEvent) {
  *  the fingers move left). Either one takes over from a paddle step or snap in progress. */
 function onCarouselWheel(e: WheelEvent) {
   if (currentPosition() === null) return
+  scheduleSnap()
   const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1
   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
     // Also stops the browser treating it as a back/forward swipe.
@@ -287,7 +301,6 @@ let touchX: number | null = null
 /** Carousel touch: a finger is down (no snapping under it), and the axis its swipe committed to. */
 let touching = false
 let touchAxis: 'x' | 'y' | null = null
-let lastScroll = 0
 function onTouchStart(e: TouchEvent) {
   touchY = e.touches[0].clientY
   touchX = e.touches[0].clientX
@@ -298,10 +311,8 @@ function onTouchStart(e: TouchEvent) {
 }
 function onTouchEnd() {
   touching = false
-  // If the page is still gliding (momentum), scrollEnd will snap; otherwise check now.
-  setTimeout(() => {
-    if (performance.now() - lastScroll > 120) maybeSnap()
-  }, 150)
+  // Any momentum glide that follows keeps restarting the wait (onScroll).
+  scheduleSnap()
 }
 function onTouchMove(e: TouchEvent) {
   if (touchY === null) return
@@ -336,13 +347,9 @@ function onTouchMove(e: TouchEvent) {
   touchY = y
 }
 
-/** Scrolling has stopped (momentum included): snap if the row came to rest close to a product. */
-function onScrollEnd() {
-  maybeSnap()
-}
-
+/** The visitor's scrolling (not a paddle step or snap moving the page) restarts the snap wait. */
 function onScroll() {
-  lastScroll = performance.now()
+  if (!animating) scheduleSnap()
 }
 
 /** The product the page should rest on: the open product in details, otherwise the nearest. */
@@ -404,7 +411,6 @@ export function attachStepNav(st: ScrollTrigger, scrollTriggerClass: typeof Scro
   window.addEventListener('touchend', onTouchEnd, { passive: true })
   window.addEventListener('touchcancel', onTouchEnd, { passive: true })
   window.addEventListener('scroll', onScroll, { passive: true })
-  scrollTriggerClass.addEventListener('scrollEnd', onScrollEnd)
   return () => {
     trigger = null
     scrollTriggerClass.removeEventListener('refreshInit', onRefreshInit)
@@ -415,6 +421,6 @@ export function attachStepNav(st: ScrollTrigger, scrollTriggerClass: typeof Scro
     window.removeEventListener('touchend', onTouchEnd)
     window.removeEventListener('touchcancel', onTouchEnd)
     window.removeEventListener('scroll', onScroll)
-    scrollTriggerClass.removeEventListener('scrollEnd', onScrollEnd)
+    clearTimeout(snapTimer)
   }
 }
