@@ -38,7 +38,10 @@ function Footer() {
   const mode = useStore((s) => s.mode)
   return (
     <footer className="site-footer" inert={mode !== 'carousel'}>
-      <p className="footer-note">Portfolio demo. Product names and copy are placeholders; not affiliated with Apple.</p>
+      <p className="footer-note">
+        Demo project. Product names and copy are placeholders. Not affiliated with, endorsed by or
+        sponsored by Apple Inc. Apple product names are trademarks of Apple Inc.
+      </p>
       <h2 className="footer-heading">3D model credits</h2>
       <ul>
         {credits.map((c) => (
