@@ -86,12 +86,13 @@ Fiber, how we debugged it, and where I think this way of working is heading.
 
 <table>
   <tr>
-    <td width="55%" valign="top">
-      <a href="docs/case-study.md#art-direction"><img src="docs/media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad with a large headline, the computer front-on in the center and copy columns on either side"></a>
-      <br><sub><b>Art direction:</b> the details view borrows its layout from a vintage print ad
-      (Heathkit H89, Heath Company, c. 1979).</sub>
+    <td width="50%" valign="top">
+      <a href="docs/case-study.md#art-direction"><img src="docs/media/heathkit-h89-ad-byte-1979.jpg" alt="1979 Heathkit H89 print ad: the headline 'no loose ends', the computer front-on in the center, and three columns of copy below"></a>
+      <br><sub><b>Art direction:</b> the details view takes its headline, centered product and
+      editorial copy from a 1979 print ad. Heathkit H89 ad, Heath Company,
+      <a href="https://archive.org/details/byte-magazine-1979-09/page/n18/mode/1up">BYTE, September 1979, p. 17</a> (scan via the Internet Archive).</sub>
     </td>
-    <td width="45%" valign="top">
+    <td width="50%" valign="top">
       <a href="docs/case-study.md#collaborating-and-debugging-with-claude"><img src="docs/media/tablet-layout-notes.png" alt="Annotated screenshot of the details view with notes for the tablet layout"></a>
       <br><sub><b>Working with Claude:</b> annotated screenshots like this one directed each layout
       change.</sub>

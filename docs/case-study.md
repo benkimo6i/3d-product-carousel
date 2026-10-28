@@ -10,7 +10,7 @@ more object**, so that what's left to design is the experience itself: the objec
 feel.
 
 I found a way into that idea in an unexpected place: a vintage computer print ad, with the product
-dead center and the copy arranged around it like a magazine spread. I wanted to bring that picture
+dead center under a big headline and the copy set in editorial columns, like a magazine spread. I wanted to bring that picture
 in my head to life: a row of products you scroll through, each one opening into a print-ad-style
 details view where you can pick the product up and turn it.
 
@@ -33,14 +33,16 @@ type, one product in focus with its neighbors peeking in at the edges, small rou
 understated "Explore" links. Everything else stays out of the way of the product.
 
 **A vintage computer print ad** set the layout of the details view. I loved how it puts the product
-dead center, front-on, with a huge headline above it and short copy blocks arranged around it in
-columns, more like a magazine spread than a web page. The details view borrows exactly that
-structure, rebuilt in a modern style: no blue-gray paper or period type, just the composition.
+dead center, front-on, with a huge headline above it and short copy blocks set in columns, more like
+a magazine spread than a web page. The details view borrows that structure and adapts it for a wide
+screen: the copy columns move to either side of the product, and it's rebuilt in a modern style,
+with no blue backdrop or period type, just the composition.
 
 <p align="center">
-  <img src="media/heathkit-ad.jpg" alt="Vintage Heathkit H89 print ad: a large 'no loose ends' headline, the computer front-on in the center, and copy columns on either side" width="560">
+  <img src="media/heathkit-h89-ad-byte-1979.jpg" alt="1979 Heathkit H89 print ad: the headline 'no loose ends', the computer front-on in the center, and three columns of copy below" width="420">
   <br>
-  <sub>Layout reference: Heathkit H89 All-In-One Computer advertisement, Heath Company (c. 1979).</sub>
+  <sub>Layout reference: Heathkit H89 All-In-One Computer ad, Heath Company.
+  <a href="https://archive.org/details/byte-magazine-1979-09/page/n18/mode/1up">BYTE, September 1979, p. 17</a> (scan via the Internet Archive).</sub>
 </p>
 
 A few decisions followed from those references:
