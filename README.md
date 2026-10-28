@@ -4,10 +4,12 @@
 
 ![Scrolling through the carousel, switching MacBook sizes, opening the details view and dragging the product](docs/media/preview.gif)
 
-A scroll-driven 3D product carousel in the style of a modern product page. Scroll or swipe through
-the lineup, open any product for a print-ad-style details view, and drag to turn it in your hands.
+A scroll-driven 3D product carousel that pairs a vintage print-ad layout with a modern product-page
+look. Scroll or swipe through the lineup, open any product for an editorial details view, and drag to
+turn it in your hands. It's an experiment in where web UI might be heading: composed rather than
+templated, with the product itself as the interface.
 
-Portfolio demo: product names and copy are placeholders, not affiliated with Apple.
+Product names and copy are placeholders; not affiliated with Apple.
 
 ## Features
 
@@ -41,6 +43,19 @@ three.js, [GSAP](https://gsap.com/) (ScrollTrigger, ScrollTo) for scroll and tim
 Blender and optimised with [glTF Transform](https://gltf-transform.dev/) and
 [KTX-Software](https://github.com/KhronosGroup/KTX-Software).
 
+### Why React Three Fiber
+
+Compared with building it in plain three.js:
+
+- **Organisation**: the scene is components (`<Stage>`, `<Carousel>`, `<Product>`, `<CameraRig>`),
+  each owning its own state and per-frame logic, alongside ordinary HTML/CSS for the copy and
+  controls.
+- **Scalability and flexibility**: the carousel is data-driven from a JSON manifest, and each product
+  loads behind its own `Suspense` and error boundary, so models stream in independently and fail
+  alone.
+- **Performance**: rendering on demand is a single prop, and per-frame values live outside React,
+  so animation never re-renders components.
+
 ### How it works
 
 - **Scroll drives everything.** The page scroll is the carousel's single source of truth:
@@ -59,11 +74,15 @@ Blender and optimised with [glTF Transform](https://gltf-transform.dev/) and
 
 ## How it was made
 
-I set the creative direction and designed the experience (the look, the layouts and how it moves),
-and built it with Claude Code doing the hands-on work under my direction: in Blender through MCP for
-Blender for the 3D scene, and in the codebase for the web build, checking every change in the browser
-along the way. The [case study](docs/case-study.md) walks through the
-art direction, the Blender setup, the React Three Fiber architecture and how we debugged it.
+The idea grew out of conversations with colleagues about the future of web UI, and a vintage
+computer print ad that showed me a way to bring it to life. I set the creative direction and designed
+the experience (the look, the layouts and how it moves), and built it with Claude Code doing the
+hands-on work under my direction. My background is in engineering, so MCP for Blender was what made
+the 3D side possible: Claude drove Blender to build the scene while I directed it, then built the web
+app in the codebase, checking every change in the browser along the way.
+
+The [case study](docs/case-study.md) covers the art direction, the Blender setup, why React Three
+Fiber, how we debugged it, and where I think this way of working is heading.
 
 <table>
   <tr>

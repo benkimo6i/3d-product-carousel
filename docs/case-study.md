@@ -2,18 +2,31 @@
 
 **Live demo: https://benkimo6i.github.io/3d-product-carousel/** · [Back to the README](../README.md)
 
-I wanted a portfolio piece that felt like a modern product launch page, but with real 3D: a row of
-products you scroll through, each one opening into a details view you can pick up and turn. I set
-the creative direction and designed the experience (the look, the layouts and how it moves), and
-built it with Claude Code doing the hands-on work under my direction, first in Blender (through MCP
-for Blender) to set up the scene, then in the codebase for the web build.
+This started with conversations with colleagues about where web UI is heading. A few ideas kept
+coming up: pages that feel **composed, like editorial print**, rather than stacked from templates;
+**the product itself as the interface**, a live object you handle instead of photos you scroll
+past; and, as more of the routine interface gets generated or handled by agents, **less chrome and
+more object**, so that what's left to design is the experience itself: the object, the motion, the
+feel.
+
+I found a way into that idea in an unexpected place: a vintage computer print ad, with the product
+dead centre and the copy arranged around it like a magazine spread. I wanted to bring that picture
+in my head to life: a row of products you scroll through, each one opening into a print-ad-style
+details view where you can pick the product up and turn it.
+
+I set the creative direction and designed the experience (the look, the layouts and how it moves),
+and built it with Claude Code doing the hands-on work under my direction, first in Blender (through
+MCP for Blender) to set up the scene, then in the codebase for the web build.
 
 This is how it came together: the art direction, the Blender setup, why I built it on React Three
-Fiber, and what working and debugging with Claude actually looked like.
+Fiber, what working and debugging with Claude looked like, and where I think this way of working is
+heading.
 
 ## Art direction
 
-Two references shaped the look.
+The direction came down to one idea: **nostalgia helps sell**. A familiar, slightly retro
+composition makes people slow down and look, and pairing it with a crisp modern aesthetic keeps it
+from feeling like a pastiche. So two references shaped the look, one old and one new.
 
 **Modern Apple product pages** set the tone for the carousel: a quiet light-grey stage, big confident
 type, one product in focus with its neighbours peeking in at the edges, small round paddles, and
@@ -45,10 +58,16 @@ A few decisions followed from those references:
 
 ## Setting up the scene: Claude + MCP for Blender
 
+My background is in engineering rather than 3D. Materials, lighting, rigging, shadow baking and
+export pipelines are a craft of their own, and on my own this is where the project would most
+likely have stalled. [MCP for Blender](https://mcp-for-blender.com/) changed that: it lets Claude
+drive a live Blender session, so I could direct the 3D work the way I'd direct a 3D artist, while
+Claude did the hands-on Blender work. It augmented the design and rendering side I don't
+specialise in.
+
 Before writing any web code I wanted the 3D assets right, so the first phase happened entirely in
-Blender, driven by Claude through [MCP for Blender](https://mcp-for-blender.com/). I
-described what I wanted, Claude wrote and ran the Blender Python, and showed me viewport renders to
-review. Then I gave notes and we went again.
+Blender. I described what I wanted, Claude wrote and ran the Blender Python, and showed me viewport
+renders to review. Then I gave notes and we went again.
 
 - **Importing and auditing.** I picked free models on Sketchfab. Claude imported them, put each in
   its own collection and reported the mesh, triangle and material counts, so we knew where the
@@ -71,22 +90,47 @@ review. Then I gave notes and we went again.
 
 ## Building it: why React Three Fiber
 
-I chose [React Three Fiber](https://r3f.docs.pmnd.rs/) because this piece is half 3D scene and half
-web page, and R3F lets both live in one React app. The 3D scene is declarative components (the
-stage, the row, each product), drei handles the loaders and environment lighting, and all the copy,
-labels and controls are ordinary HTML and CSS on top, which keeps them accessible, selectable and
-responsive. GSAP handles scroll and timelines, and zustand holds the app state.
+This piece is half 3D scene and half web page, and
+[React Three Fiber](https://r3f.docs.pmnd.rs/) (R3F) lets both live in one React app. It's a
+React renderer for three.js: the same engine underneath, but the scene is written as components.
+Compared with building it in plain three.js, that paid off in three ways.
 
-The decisions that shaped the architecture:
+**Code and component organisation.** In plain three.js, a scene like this is one long imperative
+setup: create a renderer, a scene, cameras, lights and loaders, add and remove objects by hand, wire
+up a render loop and raycasting, and remember to dispose of everything. In R3F the scene reads like
+the page it is part of: a `<Stage>`, a `<Carousel>`, a `<Product>` per item, a `<CameraRig>`. Each
+piece owns its own state and its own per-frame logic (a `useFrame` hook), so the camera, the
+products, the label anchoring and the drag controls are separate, readable files instead of
+branches in one big loop. The copy, labels and controls stay ordinary HTML and CSS on top of the
+canvas, which keeps them accessible, selectable and responsive.
+
+**Scalability and flexibility.** The carousel is data-driven: products, their order, cameras and
+per-product settings come from a JSON manifest, and the scene maps over it. Adding a product is a
+manifest entry, its model files and its copy, not new scene code. React features carry straight over to 3D:
+each product loads behind its own `Suspense` boundary (so products stream in independently and one
+slow model doesn't block the rest) and its own error boundary (so a broken model fails alone). The
+same component can swap its lightweight carousel model for the full-detail one just by rendering a
+different child. drei adds ready-made loaders and environment lighting, and GSAP and zustand plug in
+like they would in any React app.
+
+**Performance.** R3F uses the same three.js renderer, so the speed comes from patterns it makes
+easy:
+
+- Rendering on demand is one prop (`frameloop="demand"`): the canvas draws nothing while idle, and
+  anything that moves asks for frames only while it's moving.
+- Values that change every frame (scroll progress, the details transition, lid angles) live outside
+  React and are read in `useFrame`, so animation never re-renders components sixty times a second.
+  React state is kept for the slower things: which product is open, which copy is showing.
+- Per-component control made the optimisations local: off-screen products skip their own work,
+  phones render at a capped pixel ratio, and each model compiles its shaders and uploads its textures
+  as soon as it loads, rather than stuttering the first time it appears.
+
+A few other decisions shaped the architecture:
 
 - **Scroll as the single source of truth.** GSAP's ScrollTrigger turns the page's scroll position
   into a progress value, and the row's position comes straight from it. Every way of moving
   (scrolling, swiping, the paddles, snapping) ends up as a change to the page scroll, so there's
   only ever one place the carousel's position can come from.
-- **Per-frame values outside React.** Things that change every frame (progress, the details
-  transition, lid angles) live in a plain mutable object that GSAP animates and the scene reads in
-  `useFrame`, so nothing re-renders React sixty times a second. React state is kept for the slower
-  things: which product is open, which copy is showing.
 - **One camera, two poses.** The camera orbits its target in spherical coordinates, so going from the
   carousel to a details view is an arc around the product, and switching products inside details
   slides the row while the camera holds its front-on view.
@@ -94,9 +138,6 @@ The decisions that shaped the architecture:
   product goes. The camera measures that slot and the product's actual silhouette, then sizes and
   shifts the shot to fit it. Restyling the layout at any breakpoint just works, and the 3D product
   follows.
-- **Performance by default.** The canvas renders on demand (nothing at all while idle), off-screen
-  products are skipped, phones render at a capped pixel ratio, products stream in nearest-first, and
-  shaders are compiled when each model loads rather than the first time it appears.
 - **An asset pipeline, not hand edits.** The Blender exports stay lossless; one script
   (`npm run optimize`) dedups and merges materials, resizes textures by role, encodes them as KTX2
   (which stays compressed on the GPU) and compresses geometry with Meshopt. Re-exporting from
@@ -149,3 +190,20 @@ Some of the bugs we tracked down along the way:
 - **Directing with AI works best with tight loops.** Clear references, annotated screenshots and
   questions answered up front, followed by small changes checked one at a time, kept the project
   moving without losing the design intent.
+
+## Where I think this is heading
+
+Building this changed how I think about front-end work. A few years ago a piece like this would
+have needed a 3D artist, a motion designer and a front-end engineer; here, one engineer directed
+all three disciplines, with AI doing much of the hands-on work. I don't think that replaces those
+specialists, but it does change where the leverage is: in knowing what good looks like, framing the
+problem clearly, and judging the result, more than in typing every line or placing every vertex.
+
+I also suspect the role of the interface itself is shifting. If more everyday tasks move through
+agents and conversation, the generic parts of UI (forms, lists, settings screens) matter less, and
+may increasingly be composed on the fly from well-built components. What stays valuable is what
+can't be generated generically: distinctive experiences like this one, and the solid, accessible,
+well-documented building blocks that people and agents assemble from. For front-end developers
+that points towards a blend of engineer, designer and director: building fewer one-off screens and
+more of the primitives and experiences everything else is built from. It's a prediction, not a
+certainty, but this project felt like a small preview of it.
