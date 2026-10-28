@@ -1,0 +1,31 @@
+# PR previews: each pull request is built and published to gh-pages/pr-preview/pr-<number>/,
+# with the link posted on the PR. Closing the PR removes its preview.
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        if: github.event.action != 'closed'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci && npm run build
+        if: github.event.action != 'closed'
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./dist/

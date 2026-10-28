@@ -1,0 +1,87 @@
+export type Vec3 = [number, number, number]
+/** three.js order: [x, y, z, w] */
+export type Quat = [number, number, number, number]
+
+export interface CameraDef {
+  position: Vec3
+  target: Vec3
+  fovVertical: number
+  spherical: { yawDeg: number; elevationDeg: number; distance: number }
+}
+
+export interface LidDef {
+  node: string
+  axis: 'x'
+  restState: 'open'
+  closedAngleRad: number
+  defaultState: 'open' | 'closed'
+}
+
+/** A soft shadow baked in Blender, laid on the floor under the product. */
+export interface ShadowDef {
+  file: string
+  /** Centre on the floor, [x, z], relative to the product's pivot. */
+  center: [number, number]
+  /** Width (x) and depth (z) in metres. */
+  size: [number, number]
+  /** Height of the floor relative to the pivot. */
+  y: number
+}
+
+export interface ProductDef {
+  index: number
+  files: { carousel: string; detail: string }
+  /** Spin pivot relative to the slot origin (three.js coords). */
+  pivotOffset: Vec3
+  snapPoses: Record<string, Quat>
+  defaultPose: string
+  detailCamera: CameraDef
+  copyKey: string
+  lid?: LidDef
+  shadow?: ShadowDef
+  /** MacBooks: the shadow with the lid closed, blended in as the lid closes. */
+  shadowClosed?: ShadowDef
+  /**
+   * Carousel normalisation: scale (about the floor point under the pivot) and floor offset [x, z],
+   * chosen so every product sits centred and similarly sized under one fixed camera.
+   */
+  display?: { scale: number; offset: [number, number] }
+}
+
+export interface Credit {
+  model: string
+  author: string
+  license: string
+}
+
+export interface Manifest {
+  carousel: {
+    spacing: number
+    order: string[]
+    slots: Record<string, string[]>
+    camera: CameraDef
+    mbp16Camera: CameraDef
+  }
+  stage: { background: string }
+  products: Record<string, ProductDef>
+  credits: Credit[]
+}
+
+export interface CopyBlock {
+  title: string
+  body: string
+}
+
+export interface ProductCopy {
+  name: string
+  headline: string
+  subline: string
+  left: CopyBlock[]
+  right: CopyBlock[]
+  cta: CopyBlock & { actions: string[] }
+  footnote: string
+}
+
+export interface CopyDoc {
+  products: Record<string, ProductCopy>
+}
