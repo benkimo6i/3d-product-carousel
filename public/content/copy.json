@@ -5,10 +5,10 @@
     "neo": {
       "name": "MacBook Neo",
       "headline": "Bright idea.",
-      "subline": "MacBook Neo. Colour, power and all-day battery. From $X,XXX*",
+      "subline": "MacBook Neo. Color, power and all-day battery. From $X,XXX*",
       "left": [
         {
-          "title": "Made in colour",
+          "title": "Made in color",
           "body": "A finish that turns heads from every angle. Pick the shade that feels like you, and carry it everywhere."
         },
         {
@@ -32,7 +32,7 @@
       ],
       "cta": {
         "title": "Make it yours",
-        "body": "Compare models, choose a colour and see what fits your workflow.",
+        "body": "Compare models, choose a color and see what fits your workflow.",
         "actions": [
           "Buy",
           "Learn more"
@@ -119,7 +119,7 @@
     "imac": {
       "name": "iMac",
       "headline": "Say hello.",
-      "subline": "iMac. Strikingly thin, all-in-one, in a palette of colours. From $X,XXX*",
+      "subline": "iMac. Strikingly thin, all-in-one, in a palette of colors. From $X,XXX*",
       "left": [
         {
           "title": "All-in-one design",
@@ -127,10 +127,10 @@
         },
         {
           "title": "A stunning display",
-          "body": "A big, bright, colour-accurate screen that makes everything look its best."
+          "body": "A big, bright, color-accurate screen that makes everything look its best."
         },
         {
-          "title": "Colour that lifts a room",
+          "title": "Color that lifts a room",
           "body": "Seven bright finishes to match your space and your mood."
         }
       ],
@@ -145,7 +145,7 @@
         }
       ],
       "cta": {
-        "title": "Find your colour",
+        "title": "Find your color",
         "body": "Explore finishes and configurations to suit your desk.",
         "actions": [
           "Buy",
