@@ -245,6 +245,16 @@
           0,
           0
         ]
+      },
+      "screen": {
+        "material": "material",
+        "uv": [
+          0.0,
+          0.188,
+          1.0,
+          0.812
+        ],
+        "image": "screens/neo.webp"
       }
     },
     "mbp14": {
@@ -354,6 +364,16 @@
           0.039,
           -0.0498
         ]
+      },
+      "screen": {
+        "material": "HlQwFCAPWzetDQy",
+        "uv": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "image": "screens/mbp14.webp"
       }
     },
     "mbp16": {
@@ -465,6 +485,16 @@
           0.039,
           -0.0498
         ]
+      },
+      "screen": {
+        "material": "sfCQkHOWyrsLmor",
+        "uv": [
+          0.007,
+          0.993,
+          0.993,
+          0.007
+        ],
+        "image": "screens/mbp16.webp"
       }
     },
     "imac": {
@@ -551,6 +581,16 @@
           -0.0464,
           0.0593
         ]
+      },
+      "screen": {
+        "material": "Screen",
+        "uv": [
+          0.003,
+          0.793,
+          1.001,
+          0.239
+        ],
+        "image": "screens/imac.webp"
       }
     },
     "iphone": {
@@ -637,6 +677,16 @@
           -0.0349,
           0.0447
         ]
+      },
+      "screen": {
+        "material": "OLED",
+        "uv": [
+          0.998,
+          0.001,
+          0.002,
+          0.998
+        ],
+        "image": "screens/iphone.webp"
       }
     },
     "watch": {

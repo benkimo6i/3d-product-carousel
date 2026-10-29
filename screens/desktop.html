@@ -1,0 +1,260 @@
+<!doctype html>
+<!--
+  Mock desktops shown on the Mac and iPhone screens when you click the product in details.
+  Open with ?d=neo|mbp14|mbp16|imac|iphone at that device's size (see DEVICES in
+  scripts/render-screens.mjs); `npm run screens` renders all of them to public/screens/.
+  Everything here is original placeholder UI over each device's own wallpaper. (The iMac and 16" MacBook
+  Pro wallpapers are stored flipped vertically: their models show the screen texture upside down.)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock desktop</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font: 13px/1.35 -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    color: #1d1d1f;
+    background: center / 100% 100% no-repeat;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'SF Mono', Menlo, Monaco, monospace; }
+
+  /* Menu bar */
+  .menubar {
+    position: absolute; inset: 0 0 auto 0; height: 30px;
+    display: flex; align-items: center; gap: 22px; padding: 0 18px;
+    font-size: 14px; background: rgba(255,255,255,0.32); backdrop-filter: blur(20px);
+  }
+  .menubar.dark { background: rgba(0,0,0,0.25); color: #fff; }
+  .menubar b { font-weight: 700; }
+  .menubar .logo { width: 13px; height: 13px; border-radius: 50%; background: currentColor; }
+  .menubar .right { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+  .menubar .batt { width: 24px; height: 11px; border: 1.5px solid currentColor; border-radius: 3px; position: relative; opacity: 0.9; }
+  .menubar .batt::after { content: ''; position: absolute; inset: 1.5px 5px 1.5px 1.5px; background: currentColor; border-radius: 1px; }
+  .menubar .dot3 { display: flex; gap: 3px; } .menubar .dot3 i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: block; }
+  /* The MacBook Pro screens have a camera notch at top centre: keep menus clear of it. */
+  .notch .menubar { gap: 18px; }
+
+  /* Windows */
+  .win {
+    position: absolute; border-radius: 12px; overflow: hidden; background: #fff;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.32), 0 0 0 0.5px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column;
+  }
+  .win.dark { background: #1e1f22; color: #d4d4d8; box-shadow: 0 24px 60px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.12); }
+  .bar { height: 38px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid rgba(0,0,0,0.08); background: #f6f6f7; }
+  .dark .bar { background: #2a2b2f; border-color: rgba(255,255,255,0.06); }
+  .lights { display: flex; gap: 8px; flex: none; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .lights i:nth-child(1) { background: #ff5f57; } .lights i:nth-child(2) { background: #febc2e; } .lights i:nth-child(3) { background: #28c840; }
+  .title { flex: 1; text-align: center; font-weight: 600; font-size: 13px; opacity: 0.75; margin-right: 52px; }
+  .addr {
+    flex: 1; max-width: 460px; margin: 0 auto; height: 26px; border-radius: 7px; background: rgba(0,0,0,0.06);
+    display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: #444;
+  }
+  .addr .lock { width: 8px; height: 10px; border-radius: 2px; background: #888; }
+  .nav { display: flex; gap: 14px; color: #888; font-size: 18px; line-height: 1; }
+  .content { flex: 1; min-height: 0; position: relative; }
+  .content img.fill { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+
+  /* Terminal */
+  .term .content { background: #16171a; color: #d7dae0; padding: 14px 16px; font-size: 13px; line-height: 1.6; white-space: pre; }
+  .term .g { color: #7ee787; } .term .c { color: #79c0ff; } .term .d { color: #8b949e; } .term .y { color: #e3b341; } .term .w { color: #fff; font-weight: 600; }
+  .cursor { display: inline-block; width: 8px; height: 15px; background: #d7dae0; vertical-align: -2px; }
+
+  /* Code editor */
+  .editor .content { display: flex; }
+  .side { width: 210px; flex: none; background: #1a1b1e; padding: 10px 0; font-size: 12.5px; border-right: 1px solid rgba(255,255,255,0.05); }
+  .side .h { padding: 4px 14px 8px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #8b8d95; }
+  .side div.f { padding: 3px 14px; color: #b9bbc2; white-space: nowrap; }
+  .side div.f.dir { color: #8b8d95; }
+  .side div.f.on { background: #2c3b55; color: #fff; }
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .tabs { display: flex; height: 34px; background: #1a1b1e; font-size: 12.5px; }
+  .tabs span { padding: 0 16px; display: flex; align-items: center; color: #8b8d95; border-right: 1px solid rgba(255,255,255,0.04); }
+  .tabs span.on { background: #1e1f22; color: #fff; border-top: 2px solid #4c8dff; }
+  .code { flex: 1; padding: 10px 0; font-size: 13px; line-height: 1.62; white-space: pre; overflow: hidden; counter-reset: ln 82; }
+  .code div { padding-left: 64px; position: relative; }
+  .code div::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 44px; text-align: right; color: #5a5d66; }
+  .code div.hl { background: rgba(76,141,255,0.10); }
+  .k { color: #ff7ab2; } .s { color: #fc6a5d; } .t { color: #5dd8ff; } .n { color: #d9c97c; } .cm { color: #7f8c98; font-style: italic; } .fn { color: #67b7a4; } .tg { color: #a1c6ff; }
+
+  /* 3D editor */
+  .d3 { background: #2b2c30; color: #c8c9cf; }
+  .d3 .bar { background: #232427; }
+  .d3 .menus { display: flex; gap: 18px; font-size: 12.5px; color: #c8c9cf; margin-left: 10px; }
+  .d3 .content { display: flex; }
+  .tools { width: 44px; flex: none; background: #232427; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 12px; }
+  .tools i { width: 26px; height: 26px; border-radius: 6px; background: #3a3b40; display: block; }
+  .tools i.on { background: #4c7fd9; }
+  .viewport { flex: 1; position: relative; background: #e9e9ec; overflow: hidden; }
+  .viewport img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+  .viewport .grid {
+    position: absolute; left: -50%; right: -50%; bottom: -30%; height: 75%;
+    background-image: linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);
+    background-size: 48px 48px; transform: perspective(600px) rotateX(62deg); transform-origin: top;
+  }
+  .viewport .hud { position: absolute; left: 12px; top: 10px; font-size: 12px; color: #55575e; }
+  .gizmo { position: absolute; right: 16px; top: 14px; width: 64px; height: 64px; }
+  .gizmo i { position: absolute; left: 31px; top: 31px; height: 2px; transform-origin: 0 50%; display: block; }
+  .gizmo b { position: absolute; width: 16px; height: 16px; border-radius: 50%; font: 700 9px/16px sans-serif; color: #fff; text-align: center; }
+  .panel { width: 250px; flex: none; background: #2b2c30; border-left: 1px solid #1c1d20; font-size: 12.5px; display: flex; flex-direction: column; }
+  .panel .h { padding: 8px 12px; background: #313236; color: #e2e3e8; font-weight: 600; font-size: 12px; }
+  .panel .row { padding: 4px 12px 4px 26px; display: flex; gap: 8px; align-items: center; color: #c8c9cf; }
+  .panel .row.on { background: #3f5f99; color: #fff; }
+  .panel .row i { width: 10px; height: 10px; border-radius: 2px; background: #e3a85a; display: block; }
+  .panel .prop { display: flex; justify-content: space-between; padding: 4px 12px; color: #a9abb2; }
+  .panel .prop span:last-child { background: #3a3b40; color: #e2e3e8; padding: 1px 10px; border-radius: 4px; min-width: 70px; text-align: right; }
+
+  /* Image viewer */
+  .viewer .content { background: #2a2a2c; display: flex; align-items: center; justify-content: center; padding: 18px; }
+  .viewer .content img { max-width: 100%; max-height: 100%; box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+
+  /* Dock */
+  .dock {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    display: flex; gap: 8px; padding: 8px 10px; border-radius: 22px;
+    background: rgba(255,255,255,0.32); backdrop-filter: blur(24px); box-shadow: 0 0 0 0.5px rgba(255,255,255,0.4) inset, 0 10px 30px rgba(0,0,0,0.15);
+  }
+  .dock i { width: 54px; height: 54px; border-radius: 13px; display: grid; place-items: center; position: relative; font-style: normal; color: #fff; font: 700 22px/1 -apple-system, sans-serif; }
+  .dock i.run::after { content: ''; position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,0,0,0.55); }
+  .dock .sep { width: 1px; background: rgba(0,0,0,0.18); margin: 4px 2px; }
+
+  /* iPhone */
+  .phone { background: #fff; }
+  .status { position: absolute; inset: 0 0 auto 0; height: 92px; display: flex; justify-content: space-between; align-items: center; padding: 18px 50px 0; font: 600 25px/1 -apple-system, sans-serif; color: #000; }
+  .status .r { display: flex; gap: 10px; align-items: center; }
+  .bars { display: flex; gap: 3px; align-items: flex-end; } .bars i { width: 5px; background: #000; border-radius: 1px; display: block; }
+  .phone .page { position: absolute; left: 0; right: 0; top: 92px; bottom: 150px; overflow: hidden; }
+  .phone .page img { width: 100%; display: block; margin-top: -64px; }
+  .phone .safari { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: rgba(248,248,250,0.96); border-top: 1px solid rgba(0,0,0,0.08); }
+  .phone .pill { position: absolute; left: 24px; right: 24px; top: 16px; height: 52px; border-radius: 16px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; font-size: 19px; color: #222; gap: 8px; }
+  .phone .icons { position: absolute; left: 40px; right: 40px; top: 86px; display: flex; justify-content: space-between; color: #2a6ae0; font-size: 28px; }
+  .phone .home { position: absolute; left: 50%; bottom: 10px; width: 190px; height: 6px; margin-left: -95px; border-radius: 3px; background: #111; }
+</style>
+</head>
+<body>
+<script>
+const device = new URLSearchParams(location.search).get('d') || 'neo'
+document.title = `Mock desktop: ${device}`
+document.body.style.backgroundImage = `url(assets/wallpaper-${device}.jpg)`
+document.body.className = device
+
+const lights = '<div class="lights"><i></i><i></i><i></i></div>'
+const win = (cls, style, bar, content) => `<div class="win ${cls}" style="${style}"><div class="bar">${lights}${bar}</div><div class="content">${content}</div></div>`
+const browser = (style, img, path = '3d-product-carousel/') =>
+  win('browser', style, `<div class="nav">‹ ›</div><div class="addr"><span class="lock"></span>benkimo6i.github.io/${path}</div><div class="nav">+</div>`, `<img class="fill" src="assets/${img}">`)
+const term = (style, title, html) => win('term dark', style, `<div class="title">${title}</div>`, html)
+
+const DOCK = [
+  ['#f5f5f7', '#1d6fe0', '◐'], ['#3d8bfd', '#1a5fd0', '◎'], ['#2a2b2f', '#121316', '>_'], ['#2f6bdc', '#1b3f8f', '{}'],
+  ['#f39237', '#e05a1c', '◆'], ['#ffd34e', '#f5a623', '✎'], ['#ff6b8b', '#e0335a', '♪'], ['#7d8cff', '#4f5bd5', '▦'],
+]
+const dock = (running) =>
+  `<div class="dock">${DOCK.map(([a, b, g], i) => `<i class="${running.includes(i) ? 'run' : ''}" style="background:linear-gradient(${a},${b});${i === 0 ? 'color:#1d6fe0' : ''}">${g}</i>`).join('')}<span class="sep"></span><i style="background:linear-gradient(#9ec5ff,#5b8fe0)">⌂</i></div>`
+const menubar = (app, menus, dark = false) =>
+  `<div class="menubar ${dark ? 'dark' : ''}"><span class="logo"></span><b>${app}</b>${menus.map((m) => `<span>${m}</span>`).join('')}<div class="right"><span class="dot3"><i></i><i></i><i></i></span><span class="batt"></span><span>Wed Oct 28</span><span>9:41 AM</span></div></div>`
+
+const CODE = [
+  ['<span class="cm">/**</span>'],
+  ['<span class="cm"> * Drives the camera around a target in spherical coordinates, so moving between the carousel</span>'],
+  ['<span class="cm"> * view and a details view is an arc around the product rather than a straight dolly.</span>'],
+  ['<span class="cm"> */</span>'],
+  ['<span class="k">export function</span> <span class="fn">CameraRig</span>() {'],
+  ['  <span class="k">const</span> camera = <span class="fn">useThree</span>((s) => s.camera) <span class="k">as</span> <span class="t">PerspectiveCamera</span>'],
+  ['  <span class="k">const</span> size = <span class="fn">useThree</span>((s) => s.size)'],
+  ['  <span class="k">const</span> manifest = <span class="fn">useStore</span>((s) => s.manifest)'],
+  [''],
+  ['  <span class="fn">useFrame</span>(({ invalidate }, dt) => {'],
+  ['    <span class="k">const</span> { mode, detailKey } = useStore.<span class="fn">getState</span>()'],
+  ['    <span class="cm">// One fixed carousel framing for every product: switching is a pure slide.</span>'],
+  ['    <span class="k">const</span> fit = Math.<span class="fn">max</span>(<span class="n">1</span>, <span class="t">DESIGN_ASPECT</span> / camera.aspect)'],
+  ['    <span class="fn">lerpOrbit</span>(carousel, carousel, <span class="n">0</span>, base)'],
+  ['    base.distance *= <span class="t">CAROUSEL_ZOOM_OUT</span> * fit'],
+  [''],
+  ['    <span class="k">const</span> key = detailKey ?? lastDetailKey.current', 'hl'],
+  ['    <span class="k">if</span> (key) {'],
+  ['      <span class="k">const</span> r = <span class="fn">goalFor</span>(key, framing)'],
+  ['      <span class="cm">// Glides if the framing changes while details is open.</span>'],
+  ['      <span class="k">const</span> k = <span class="n">1</span> - Math.<span class="fn">exp</span>(<span class="n">-6</span> * dt)'],
+  ['      <span class="fn">lerpOrbit</span>(detail, r.goal, k, detail)'],
+  ['    }'],
+  [''],
+  ['    <span class="fn">lerpOrbit</span>(base, detail, motion.detail, out)'],
+  ['    <span class="k">const</span> d = out.distance'],
+  ['    camera.position.<span class="fn">set</span>('],
+  ['      out.target.x - Math.<span class="fn">sin</span>(out.yaw) * Math.<span class="fn">cos</span>(out.elevation) * d,'],
+  ['      out.target.y + Math.<span class="fn">sin</span>(out.elevation) * d,'],
+  ['      out.target.z + Math.<span class="fn">cos</span>(out.yaw) * Math.<span class="fn">cos</span>(out.elevation) * d,'],
+  ['    )'],
+  ['    camera.<span class="fn">lookAt</span>(out.target)'],
+  ['  })'],
+  ['  <span class="k">return</span> <span class="k">null</span>'],
+  ['}'],
+]
+const FILES = [['src', 'dir'], ['  three', 'dir'], ['    BakedShadow.tsx'], ['    CameraRig.tsx', 'on'], ['    Carousel.tsx'], ['    DetailControls.tsx'], ['    LabelAnchor.tsx'], ['    Product.tsx'], ['    Stage.tsx'], ['  ui', 'dir'], ['    DetailOverlay.tsx'], ['    NavArrows.tsx'], ['  App.tsx'], ['  stepNav.ts'], ['  store.ts'], ['scripts', 'dir'], ['  optimize-models.mjs'], ['package.json'], ['README.md']]
+const editor = (style) =>
+  win('editor dark', style, '<div class="title">CameraRig.tsx — 3d-product-carousel</div>',
+    `<div class="side"><div class="h">Explorer</div>${FILES.map(([f, c = '']) => `<div class="f ${c}">${f.replace(/ /g, '&nbsp;')}</div>`).join('')}</div>
+     <div class="main"><div class="tabs"><span>Product.tsx</span><span class="on">CameraRig.tsx</span><span>stepNav.ts</span></div>
+     <div class="code mono">${CODE.map(([l, c = '']) => `<div class="${c}">${l || ' '}</div>`).join('')}</div></div>`)
+
+const OUTLINER = ['Camera', 'Key light', 'Sweep', 'neo', 'mbp14', 'mbp16', 'imac', 'iphone', 'watch', 'airpods']
+const editor3d = (style) =>
+  `<div class="win d3" style="${style}"><div class="bar">${lights}<div class="menus"><span>File</span><span>Edit</span><span>View</span><span>Object</span><span>Render</span></div><div class="title" style="margin-right:120px">apple_carousel — Layout</div></div>
+   <div class="content"><div class="tools"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+   <div class="viewport"><div class="grid"></div><img src="assets/viewport-neo.jpg"><div class="hud">User Perspective<br>(1) neo · 31,204 tris</div>
+     <div class="gizmo"><i style="width:28px;background:#e5484d;transform:rotate(-20deg)"></i><i style="width:28px;background:#46a758;transform:rotate(-95deg)"></i><i style="width:24px;background:#3e83f8;transform:rotate(150deg)"></i>
+     <b style="left:54px;top:18px;background:#e5484d">X</b><b style="left:26px;top:-4px;background:#46a758">Z</b><b style="left:2px;top:42px;background:#3e83f8">Y</b></div></div>
+   <div class="panel"><div class="h">Scene Collection</div>${OUTLINER.map((o) => `<div class="row ${o === 'neo' ? 'on' : ''}"><i></i>${o}</div>`).join('')}
+     <div class="h" style="margin-top:10px">Object · neo</div>
+     ${[['Location X', '0.000 m'], ['Location Y', '0.000 m'], ['Rotation Z', '-38°'], ['Scale', '1.000'], ['Material', 'Screen glow']].map(([k, v]) => `<div class="prop"><span>${k}</span><span>${v}</span></div>`).join('')}</div></div></div>`
+
+const W = innerWidth
+const H = innerHeight
+let html = ''
+if (device === 'neo') {
+  html =
+    menubar('Browser', ['File', 'Edit', 'View', 'History', 'Bookmarks', 'Window', 'Help']) +
+    browser(`left:40px;top:58px;width:${W * 0.62}px;height:${H * 0.68}px`, 'site-carousel.jpg') +
+    term(`left:${W * 0.56}px;top:${H * 0.36}px;width:${W * 0.4}px;height:${H * 0.44}px`, 'web — npm run dev',
+      `<span class="d">~/apple-carousel/web</span> <span class="g">❯</span> npm run dev\n\n<span class="w">  VITE</span> <span class="c">v8.3.5</span>  <span class="d">ready in</span> <span class="w">142 ms</span>\n\n  <span class="g">➜</span>  <span class="w">Local:</span>   <span class="c">http://localhost:5173/</span>\n  <span class="g">➜</span>  <span class="d">Network: use --host to expose</span>\n\n<span class="d">7:08:42 PM</span> <span class="c">[vite]</span> <span class="g">hmr update</span> <span class="d">/src/three/CameraRig.tsx</span>\n<span class="d">7:09:15 PM</span> <span class="c">[vite]</span> <span class="g">hmr update</span> <span class="d">/src/three/LabelAnchor.tsx</span>\n<span class="cursor"></span>`) +
+    dock([0, 1, 2])
+} else if (device === 'mbp14') {
+  document.body.classList.add('notch')
+  html =
+    menubar('Code', ['File', 'Edit', 'Selection', 'View', 'Go', 'Run'], true) +
+    editor(`left:36px;top:52px;width:${W * 0.64}px;height:${H * 0.76}px`) +
+    browser(`left:${W * 0.55}px;top:${H * 0.3}px;width:${W * 0.42}px;height:${H * 0.5}px`, 'site-details.jpg') +
+    dock([0, 1, 3])
+} else if (device === 'mbp16') {
+  document.body.classList.add('notch')
+  html =
+    menubar('3D Editor', ['File', 'Edit', 'Render', 'Window', 'Help'], true) +
+    editor3d(`left:36px;top:52px;width:${W * 0.68}px;height:${H * 0.74}px`) +
+    term(`left:${W * 0.6}px;top:${H * 0.4}px;width:${W * 0.37}px;height:${H * 0.42}px`, 'web — npm run optimize',
+      `<span class="g">❯</span> npm run optimize\n\n` +
+      [['airpods.glb', '2635', '600'], ['imac.glb', '622', '190'], ['iphone.glb', '17382', '602'], ['mbp14.glb', '4450', '560'], ['mbp16.glb', '4795', '574'], ['neo.glb', '9316', '540'], ['watch.glb', '8552', '1662'], ['neo_detail.glb', '10132', '791']]
+        .map(([n, a, b]) => `<span class="w">${n.padEnd(16)}</span><span class="d">${(a + ' KB').padStart(9)}</span> <span class="y">→</span> <span class="g">${(b + ' KB').padStart(8)}</span>`).join('\n') +
+      `\n\n<span class="g">✓</span> KTX2 + Meshopt <span class="d">· 14 models</span>\n<span class="cursor"></span>`) +
+    dock([2, 4])
+} else if (device === 'imac') {
+  html =
+    menubar('Preview', ['File', 'Edit', 'View', 'Go', 'Tools', 'Window', 'Help']) +
+    browser(`left:46px;top:62px;width:${W * 0.56}px;height:${H * 0.72}px`, 'site-details.jpg') +
+    win('viewer', `left:${W * 0.5}px;top:${H * 0.2}px;width:${W * 0.46}px;height:${H * 0.66}px`, '<div class="title">tablet-layout-notes.png</div>', '<img src="assets/layout-notes.jpg">') +
+    dock([0, 1, 7])
+} else {
+  document.body.classList.add('phone')
+  document.body.style.backgroundImage = 'none'
+  html = `<div class="status"><span>9:41</span><span class="r"><span class="bars"><i style="height:8px"></i><i style="height:12px"></i><i style="height:16px"></i><i style="height:20px"></i></span><span class="batt" style="width:42px;height:20px;border:2.5px solid #000;border-radius:6px;position:relative;display:inline-block"><span style="position:absolute;inset:2.5px 8px 2.5px 2.5px;background:#000;border-radius:2px"></span></span></span></div>
+    <div class="page"><img src="assets/site-mobile.jpg"></div>
+    <div class="safari"><div class="pill"><span style="width:10px;height:13px;border-radius:2px;background:#666;display:inline-block"></span>benkimo6i.github.io</div><div class="icons"><span>‹</span><span style="opacity:.35">›</span><span>⇪</span><span>▢</span><span>⧉</span></div></div><div class="home"></div>`
+}
+document.body.insertAdjacentHTML('beforeend', html)
+</script>
+</body>
+</html>
