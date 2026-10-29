@@ -21,6 +21,9 @@ Product names and copy are placeholders; not affiliated with Apple.
 - **Screens that wake up**: click a Mac or the iPhone in the details view and its wallpaper gives way
   to a mock desktop: creative apps on the Pros and iMac (design tool, photo editor, video editor),
   everyday apps on the Neo and iPhone.
+- **Watch face animation**: click the Watch in the details view and its face animates in: activity
+  rings, the temperature gauge and the music ring sweep in, the UV forecast bars rise, the compass
+  swings into place and the runner runs in. Only the graphics move; the type stays put.
 - **MacBook Pro 14"/16" toggle**: the open lid closes, the machines crossfade and the other lid
   opens, shown at their real relative sizes.
 - **Responsive layouts**: a three-column print-ad layout on desktop, product beside a scrolling copy
@@ -34,7 +37,7 @@ Product names and copy are placeholders; not affiliated with Apple.
 |---|---|---|
 | Scroll / swipe | Scrub the row (vertical or sideways); snaps when you stop near a product | Scroll the copy; swipe sideways to switch products |
 | Paddles ‹ › | One product left or right | Previous / next product |
-| Click a product or **Explore** | Open its details | Macs and iPhone: show or hide the mock desktop |
+| Click a product or **Explore** | Open its details | Macs and iPhone: show or hide the mock desktop. Watch: play the face animation |
 | Drag | — | Rotate the product |
 | Keyboard | Tab to the paddles and Explore | ← / → switch products, Esc closes |
 

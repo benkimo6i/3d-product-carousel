@@ -28,7 +28,7 @@ export interface ShadowDef {
   y: number
 }
 
-/** A display that can show a mock desktop (click the product in details to toggle it). */
+/** A display that reacts when you click the product in details: a mock desktop, or the Watch's animated face. */
 export interface ScreenDef {
   /** Material of the screen surface (its emissive map is the wallpaper). */
   material: string
@@ -38,8 +38,13 @@ export interface ScreenDef {
    * lists that range reversed (the iMac's and 16" MacBook Pro's v, the iPhone's u).
    */
   uv: [number, number, number, number]
-  /** The mock desktop image, at the display's aspect ratio (rendered by `npm run screens`). */
+  /**
+   * The mock desktop image, at the display's aspect ratio (rendered by `npm run screens`); for the
+   * Watch, its original face, upright, which the animation reveals piece by piece.
+   */
   image: string
+  /** 'watch': a click replays the face's animation instead of toggling a desktop. */
+  live?: 'watch'
 }
 
 export interface ProductDef {

@@ -3,11 +3,12 @@ import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { Frustum, MathUtils, Matrix4, Sphere, Vector3, type Camera, type Group, type MeshBasicMaterial, type Object3D } from 'three'
 import { FADE_PASS_ORDER, Model, type LoadedModel } from './Model'
 import { BakedShadow, type ShadowTuning } from './BakedShadow'
-import { motion, productDisplays, productRoots, useStore } from '../store'
+import { motion, motionScale, productDisplays, productRoots, useStore } from '../store'
 import { openDetail, scrollToSlot, toggleScreen } from '../actions'
 import { slotReady } from './loadQueue'
 import { mbp } from '../mbpSwap'
 import { loadScreenImage, patchScreenMaterial, screenUniforms } from './screenWake'
+import { createWatchFaceAnimation, type WatchFaceAnimation } from './watchFace'
 import type { ProductDef } from '../types'
 
 interface Props {
@@ -74,7 +75,9 @@ export function Product({ pkey, def, slot }: Props) {
   const manifest = useStore((s) => s.manifest)
   // Screen products: both model versions' screen materials share these, so the state survives a swap.
   const screen = useRef(
-    def.screen ? { uniforms: screenUniforms(def.screen), loading: false, ready: false } : null,
+    def.screen
+      ? { uniforms: screenUniforms(def.screen), loading: false, ready: false, anim: null as WatchFaceAnimation | null, replay: 0 }
+      : null,
   ).current
 
   // Both MacBook Pros share the 14"'s spot (the swap crossfades between them in place).
@@ -172,10 +175,28 @@ export function Product({ pkey, def, slot }: Props) {
       if (here && !screen.loading) {
         screen.loading = true
         loadScreenImage(`${import.meta.env.BASE_URL}${def.screen.image}`).then((t) => {
-          screen.uniforms.screenWakeMap.value = t
+          if (def.screen?.live === 'watch') {
+            screen.anim = createWatchFaceAnimation(t.image as CanvasImageSource, motionScale())
+            screen.uniforms.screenWakeMap.value = screen.anim.texture
+          } else screen.uniforms.screenWakeMap.value = t
           screen.ready = true
           invalidate()
         })
+      }
+      if (screen.anim) {
+        // The Watch: each click replays the face animation. Its canvas shows only while it plays (it
+        // ends on the original face, so handing back to the texture is seamless).
+        const { screenReplay } = useStore.getState()
+        if (screenReplay !== screen.replay) {
+          screen.replay = screenReplay
+          if (here) screen.anim.play()
+        }
+        if (!here) screen.anim.stop()
+        const playing = screen.anim.update(performance.now())
+        if (playing) invalidate()
+        s.wake = playing ? 1 : 0
+        screen.uniforms.screenWake.value = s.wake
+        return
       }
       const wakeGoal = here && screenOn && screen.ready ? 1 : 0
       s.wake = MathUtils.damp(s.wake, wakeGoal, 7, dt)
