@@ -46,6 +46,8 @@ export function loadScreenImage(url: string): Promise<Texture> {
  */
 export function patchScreenMaterial(material: Material, uniforms: ScreenUniforms) {
   material.toneMapped = false
+  // For inspecting a screen from the console (e.g. the Watch face animation's canvas).
+  material.userData.screen = uniforms
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.fragmentShader = shader.fragmentShader

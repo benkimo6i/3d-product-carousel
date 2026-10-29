@@ -96,11 +96,16 @@ export function setMbpSize(size: '14' | '16') {
   })
 }
 
-/** Details: toggles the product's screen between its wallpaper and the mock desktop. */
+/**
+ * Details: toggles the product's screen between its wallpaper and the mock desktop (the Watch
+ * replays its face animation instead).
+ */
 export function toggleScreen() {
   const s = useStore.getState()
-  if (s.mode !== 'detail' || !s.detailKey || !s.manifest.products[s.detailKey].screen) return
-  s.setScreenOn(!s.screenOn)
+  const screen = s.mode === 'detail' && s.detailKey ? s.manifest.products[s.detailKey].screen : undefined
+  if (!screen) return
+  if (screen.live === 'watch') s.replayScreen()
+  else s.setScreenOn(!s.screenOn)
 }
 
 export function slotOf(key: string): number {

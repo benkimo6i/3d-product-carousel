@@ -27,6 +27,8 @@ interface State {
   prefetch: string[]
   /** Details: the product's screen shows its mock desktop instead of the wallpaper. */
   screenOn: boolean
+  /** Details: bumped to replay the Watch face's animation. */
+  screenReplay: number
   setNearest: (nearest: number, settled: boolean) => void
   setHintDismissed: (dismissed: boolean) => void
   setCopyKey: (key: string | null) => void
@@ -35,6 +37,7 @@ interface State {
   setDetailKey: (key: string | null) => void
   setMbpSize: (size: MbpSize) => void
   setScreenOn: (on: boolean) => void
+  replayScreen: () => void
 }
 
 export const useStore = create<State>()((set) => ({
@@ -51,6 +54,7 @@ export const useStore = create<State>()((set) => ({
   loadable: [0],
   prefetch: [],
   screenOn: false,
+  screenReplay: 0,
   setNearest: (nearest, settled) => set({ nearest, settled }),
   setHintDismissed: (hintDismissed) => set({ hintDismissed }),
   setCopyKey: (copyKey) => set({ copyKey }),
@@ -59,6 +63,7 @@ export const useStore = create<State>()((set) => ({
   setDetailKey: (detailKey) => set({ detailKey }),
   setMbpSize: (mbpSize) => set({ mbpSize }),
   setScreenOn: (screenOn) => set({ screenOn }),
+  replayScreen: () => set((s) => ({ screenReplay: s.screenReplay + 1 })),
 }))
 
 /** Values read every frame; mutated by GSAP and ScrollTrigger, never trigger React renders. */

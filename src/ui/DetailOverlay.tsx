@@ -141,7 +141,7 @@ export function DetailOverlay() {
   if (!key) return null
   const c: ProductCopy = copy.products[key]
   const isMbp = key === 'mbp14' || key === 'mbp16'
-  const hasScreen = !!manifest.products[key]?.screen
+  const screenDef = manifest.products[key]?.screen
 
   return (
     <div
@@ -213,11 +213,16 @@ export function DetailOverlay() {
       </p>
       {/* Clicking the product toggles its screen; this is the keyboard / screen-reader way to, shown
           only while focused. */}
-      {hasScreen && (
-        <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleScreen}>
-          Show desktop on screen
-        </button>
-      )}
+      {screenDef &&
+        (screenDef.live === 'watch' ? (
+          <button className="screen-toggle" onClick={toggleScreen}>
+            Play watch face animation
+          </button>
+        ) : (
+          <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleScreen}>
+            Show desktop on screen
+          </button>
+        ))}
     </div>
   )
 }
