@@ -6,6 +6,8 @@ import { LABEL_GAP_PX } from './carouselCentering'
 
 /** Gap between the bottom of the product and the hint under it in details, in CSS pixels. */
 const HINT_GAP_PX = 18
+/** Extra drop for a carousel label (CSS px): the Watch's soft shadow reaches further down than its band. */
+const LABEL_NUDGE_PX: Record<string, number> = { watch: 10 }
 
 const anchors = { label: -1, hint: -1 }
 const written = { label: '', hint: '' }
@@ -40,11 +42,13 @@ export function LabelAnchor() {
     const ui = document.querySelector<HTMLElement>('.carousel-ui')
     // The MacBook slot shares one framing (the 16"'s), so its label anchors to the 16" and stays put
     // whichever size is showing.
-    const root = productRoots.get(activeKey(manifest, nearest, '16'))
+    const key = activeKey(manifest, nearest, '16')
+    const root = productRoots.get(key)
     if (ui && root && mode === 'carousel') {
       const maxTop = size.height - ui.offsetHeight - 24
       const [, bottom] = restingScreenSpan(root, camera, size.height)
-      moving = place(ui, '--label-top', 'label', Math.min(bottom + LABEL_GAP_PX, maxTop), dt)
+      const gap = LABEL_GAP_PX + (LABEL_NUDGE_PX[key] ?? 0)
+      moving = place(ui, '--label-top', 'label', Math.min(bottom + gap, maxTop), dt)
     }
 
     const overlay = document.querySelector<HTMLElement>('.detail-overlay')

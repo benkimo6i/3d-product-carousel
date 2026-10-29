@@ -60,6 +60,11 @@ function poseCamera(cam: PerspectiveCamera, orbit: Orbit, like: PerspectiveCamer
 }
 const lidHinges = new Map<string, Object3D | null>()
 
+const isInside = (o: Object3D, root: Object3D) => {
+  for (let p: Object3D | null = o; p; p = p.parent) if (p === root) return true
+  return false
+}
+
 /**
  * Runs `fn` with the MacBook's lid set fully open. The two MacBook Pros share the 16"'s framing,
  * which must be measured open even while the 16" sits closed behind the 14".
@@ -67,7 +72,9 @@ const lidHinges = new Map<string, Object3D | null>()
 function withLidOpen<T>(key: string, root: Object3D, node: string | undefined, fn: () => T): T {
   if (!node) return fn()
   let hinge = lidHinges.get(key)
-  if (!hinge || !hinge.parent) {
+  // The model swaps between its carousel and detailed versions; a hinge from the other one still
+  // has a parent (inside its cached scene) but no longer moves this product's lid.
+  if (!hinge || !isInside(hinge, root)) {
     hinge = root.getObjectByName(node) ?? null
     lidHinges.set(key, hinge)
   }
