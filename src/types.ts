@@ -47,6 +47,16 @@ export interface ScreenDef {
   live?: 'watch'
 }
 
+/** AirPods: click in details to put the buds in the case and close it (the lid is a `LidDef`). */
+export interface CaseDef {
+  /**
+   * Each bud's pivot node (at the stem's tip) and two poses, three.js, relative to the product root:
+   * `hover`, stem lined up over its hole at its resting height; `seat`, slid down the hole and
+   * turned inwards into its cup.
+   */
+  buds: { node: string; hover: { position: Vec3; quaternion: Quat }; seat: { position: Vec3; quaternion: Quat } }[]
+}
+
 export interface ProductDef {
   index: number
   files: { carousel: string; detail: string }
@@ -66,6 +76,7 @@ export interface ProductDef {
    */
   display?: { scale: number; offset: [number, number] }
   screen?: ScreenDef
+  case?: CaseDef
 }
 
 export interface Credit {

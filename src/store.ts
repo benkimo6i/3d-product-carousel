@@ -25,7 +25,10 @@ interface State {
   loadable: number[]
   /** Detail models fetched and warmed up in the background, ahead of opening them. */
   prefetch: string[]
-  /** Details: the product's screen shows its mock desktop instead of the wallpaper. */
+  /**
+   * Details: the product's click state. Macs and iPhone: the screen shows its mock desktop.
+   * AirPods: the buds are in the case and the lid is shut.
+   */
   screenOn: boolean
   /** Details: bumped to replay the Watch face's animation. */
   screenReplay: number
