@@ -1,0 +1,908 @@
+{
+  "_units": "metres, three.js Y-up (converted from Blender Z-up). Quaternions are [x,y,z,w]. Product meshes are baked at display scale with the origin at their spin pivot.",
+  "carousel": {
+    "axis": "x",
+    "spacing": 0.7,
+    "order": [
+      "neo",
+      "mbp",
+      "imac",
+      "iphone",
+      "watch",
+      "airpods"
+    ],
+    "slots": {
+      "neo": [
+        "neo"
+      ],
+      "mbp": [
+        "mbp14",
+        "mbp16"
+      ],
+      "imac": [
+        "imac"
+      ],
+      "iphone": [
+        "iphone"
+      ],
+      "watch": [
+        "watch"
+      ],
+      "airpods": [
+        "airpods"
+      ]
+    },
+    "scrollTo": "carouselGroup.position.x = -index * spacing",
+    "camera": {
+      "position": [
+        -0.91333,
+        0.69937,
+        1.16901
+      ],
+      "target": [
+        0.0,
+        0.1,
+        -0.0
+      ],
+      "fovVertical": 16.461,
+      "lensMm": 70,
+      "sensorWidthMm": 36,
+      "spherical": {
+        "yawDeg": 38,
+        "elevationDeg": 22,
+        "distance": 1.6
+      }
+    },
+    "mbp16Camera": {
+      "position": [
+        -1.0055,
+        0.81529,
+        0.84614
+      ],
+      "target": [
+        0.022,
+        0.141,
+        -0.469
+      ],
+      "fovVertical": 16.461,
+      "lensMm": 70,
+      "sensorWidthMm": 36,
+      "spherical": {
+        "yawDeg": 38,
+        "elevationDeg": 22,
+        "distance": 1.8
+      }
+    }
+  },
+  "stage": {
+    "background": "#EDEDEF",
+    "floorAndSweep": "seamless sweep, floor y=0, curves up 1.2\u20132.0 m behind (three -z)",
+    "lights": {
+      "key": {
+        "type": "spot",
+        "position": [
+          -0.35,
+          1.9,
+          0.55
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "angleDeg": 38,
+        "penumbra": 0.9,
+        "castShadow": true
+      },
+      "top": {
+        "type": "area/rect or hemisphere",
+        "position": [
+          0,
+          1.4,
+          0.1
+        ],
+        "castShadow": true
+      },
+      "rim": {
+        "type": "rect",
+        "position": [
+          0.3,
+          0.7,
+          -0.9
+        ],
+        "castShadow": false
+      },
+      "fill": {
+        "type": "rect",
+        "position": [
+          -1.4,
+          0.5,
+          0.9
+        ],
+        "castShadow": false
+      },
+      "environment": "neutral studio HDRI, low intensity"
+    }
+  },
+  "timing": {
+    "_fps_reference": 30,
+    "scroll": {
+      "duration": 1.0,
+      "ease": "smootherstep / power2.inOut"
+    },
+    "mbp16FadeIn": {
+      "delay": 0.83,
+      "duration": 0.67,
+      "to": 0.5
+    },
+    "toggle": {
+      "duration": 1.0,
+      "lidOpen": 1.1,
+      "otherFadeTo": 0.55,
+      "cameraReframe": 1.0
+    },
+    "openDetails": {
+      "cameraArc": 1.5,
+      "neighboursFadeOut": 0.83,
+      "copyFadeIn": {
+        "delay": 1.0,
+        "duration": 0.83
+      }
+    },
+    "snap": {
+      "duration": 0.6,
+      "ease": "back.out(1.2)"
+    },
+    "closeDetails": {
+      "copyFadeOut": 0.5,
+      "cameraArc": 1.5,
+      "neighboursFadeIn": 1.0
+    }
+  },
+  "copy": "content/copy.json",
+  "products": {
+    "neo": {
+      "index": 0,
+      "files": {
+        "carousel": "models/neo.glb",
+        "detail": "models/neo_detail.glb"
+      },
+      "pivotOffset": [
+        0.0,
+        0.10592,
+        -0.0
+      ],
+      "displayScale": 1.0,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "keyboard_high": [
+          0.254887,
+          -0.167731,
+          0.044943,
+          0.951251
+        ],
+        "back_logo": [
+          0.0,
+          0.984808,
+          -0.0,
+          0.173648
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.39913,
+          1.51178
+        ],
+        "target": [
+          0.0,
+          0.13256,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.5351
+        }
+      },
+      "copyKey": "neo",
+      "shadow": {
+        "file": "shadows/neo.webp",
+        "center": [
+          0.0,
+          -0.01198
+        ],
+        "size": [
+          0.48,
+          0.51656
+        ],
+        "y": -0.10542
+      },
+      "display": {
+        "scale": 1,
+        "offset": [
+          0,
+          0
+        ]
+      },
+      "screen": {
+        "material": "material",
+        "uv": [
+          0.0,
+          0.188,
+          1.0,
+          0.812
+        ],
+        "image": "screens/neo.webp"
+      }
+    },
+    "mbp14": {
+      "index": 1,
+      "files": {
+        "carousel": "models/mbp14.glb",
+        "detail": "models/mbp14_detail.glb"
+      },
+      "pivotOffset": [
+        0.0,
+        0.1059,
+        0.0
+      ],
+      "displayScale": 1.0,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "keyboard_high": [
+          0.254887,
+          -0.167731,
+          0.044943,
+          0.951251
+        ],
+        "back_logo": [
+          0.0,
+          0.984808,
+          -0.0,
+          0.173648
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.41084,
+          1.57225
+        ],
+        "target": [
+          0.0,
+          0.13361,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.5965
+        }
+      },
+      "copyKey": "mbp14",
+      "slot": {
+        "sharesSlotWith": "mbp16",
+        "role": "primary"
+      },
+      "lid": {
+        "node": "mbp14_LidHinge",
+        "axis": "x",
+        "restState": "open",
+        "closedAngleRad": 1.94402,
+        "defaultState": "open"
+      },
+      "shadow": {
+        "file": "shadows/mbp14.webp",
+        "center": [
+          -0.0,
+          0.025
+        ],
+        "size": [
+          0.492,
+          0.53065
+        ],
+        "y": -0.1054
+      },
+      "shadowClosed": {
+        "file": "shadows/mbp14_closed.webp",
+        "center": [
+          -0.0,
+          0.06478
+        ],
+        "size": [
+          0.492,
+          0.4511
+        ],
+        "y": -0.1054
+      },
+      "display": {
+        "scale": 0.8795,
+        "offset": [
+          0.039,
+          -0.0498
+        ]
+      },
+      "screen": {
+        "material": "HlQwFCAPWzetDQy",
+        "uv": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "image": "screens/mbp14.webp"
+      }
+    },
+    "mbp16": {
+      "index": 1,
+      "files": {
+        "carousel": "models/mbp16.glb",
+        "detail": "models/mbp16_detail.glb"
+      },
+      "pivotOffset": [
+        0.022,
+        0.12118,
+        -0.46919
+      ],
+      "displayScale": 1.0,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "keyboard_high": [
+          0.254887,
+          -0.167731,
+          0.044943,
+          0.951251
+        ],
+        "back_logo": [
+          0.0,
+          0.984808,
+          -0.0,
+          0.173648
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.46912,
+          1.79393
+        ],
+        "target": [
+          0.0,
+          0.1528,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.8216
+        }
+      },
+      "copyKey": "mbp16",
+      "slot": {
+        "sharesSlotWith": "mbp14",
+        "role": "secondary",
+        "idleOpacity": 0.5,
+        "hiddenOpacity": 0.0
+      },
+      "lid": {
+        "node": "mbp16_LidHinge",
+        "axis": "x",
+        "restState": "open",
+        "closedAngleRad": 1.94129,
+        "defaultState": "closed"
+      },
+      "shadow": {
+        "file": "shadows/mbp16.webp",
+        "center": [
+          -0.0,
+          0.025
+        ],
+        "size": [
+          0.536,
+          0.56772
+        ],
+        "y": -0.12068
+      },
+      "shadowClosed": {
+        "file": "shadows/mbp16_closed.webp",
+        "center": [
+          -0.0,
+          0.06948
+        ],
+        "size": [
+          0.536,
+          0.47876
+        ],
+        "y": -0.12068
+      },
+      "display": {
+        "scale": 0.8795,
+        "offset": [
+          0.039,
+          -0.0498
+        ]
+      },
+      "screen": {
+        "material": "sfCQkHOWyrsLmor",
+        "uv": [
+          0.007,
+          0.993,
+          0.993,
+          0.007
+        ],
+        "image": "screens/mbp16.webp"
+      }
+    },
+    "imac": {
+      "index": 2,
+      "files": {
+        "carousel": "models/imac.glb",
+        "detail": "models/imac_detail.glb"
+      },
+      "pivotOffset": [
+        -0.0,
+        0.1647,
+        0.0
+      ],
+      "displayScale": 0.72,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "profile": [
+          0.0,
+          -0.707107,
+          -0.0,
+          0.707107
+        ],
+        "back": [
+          0.0,
+          0.984808,
+          -0.0,
+          0.173648
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.56016,
+          2.03895
+        ],
+        "target": [
+          0.0,
+          0.20064,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 2.0704
+        }
+      },
+      "copyKey": "imac",
+      "shadow": {
+        "file": "shadows/imac.webp",
+        "center": [
+          -0.0,
+          0.025
+        ],
+        "size": [
+          0.57384,
+          0.33447
+        ],
+        "y": -0.1642
+      },
+      "display": {
+        "scale": 0.7097,
+        "offset": [
+          -0.0464,
+          0.0593
+        ]
+      },
+      "screen": {
+        "material": "Screen",
+        "uv": [
+          0.003,
+          0.793,
+          1.001,
+          0.239
+        ],
+        "image": "screens/imac.webp"
+      }
+    },
+    "iphone": {
+      "index": 3,
+      "files": {
+        "carousel": "models/iphone.glb",
+        "detail": "models/iphone_detail.glb"
+      },
+      "pivotOffset": [
+        0.0,
+        0.14779,
+        0.0
+      ],
+      "displayScale": 2.0,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.258819,
+          -0.0,
+          0.965926
+        ],
+        "face_right": [
+          0.0,
+          0.258819,
+          -0.0,
+          0.965926
+        ],
+        "back_cameras": [
+          -0.0,
+          1.0,
+          -0.0,
+          -0.0
+        ],
+        "back_angle": [
+          0.0,
+          0.965926,
+          -0.0,
+          0.258819
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.50262,
+          1.82948
+        ],
+        "target": [
+          0.0,
+          0.18003,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.8577
+        }
+      },
+      "copyKey": "iphone",
+      "shadow": {
+        "file": "shadows/iphone.webp",
+        "center": [
+          0.0,
+          0.025
+        ],
+        "size": [
+          0.3262,
+          0.31463
+        ],
+        "y": -0.14729
+      },
+      "display": {
+        "scale": 0.7999,
+        "offset": [
+          -0.0349,
+          0.0447
+        ]
+      },
+      "screen": {
+        "material": "OLED",
+        "uv": [
+          0.998,
+          0.001,
+          0.002,
+          0.998
+        ],
+        "image": "screens/iphone.webp"
+      }
+    },
+    "watch": {
+      "index": 4,
+      "files": {
+        "carousel": "models/watch.glb",
+        "detail": "models/watch_detail.glb"
+      },
+      "pivotOffset": [
+        0.0,
+        0.13082,
+        -0.0
+      ],
+      "displayScale": 2.2,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "side_action_button": [
+          0.0,
+          -0.707107,
+          -0.0,
+          0.707107
+        ],
+        "side_crown": [
+          0.0,
+          0.707107,
+          -0.0,
+          0.707107
+        ],
+        "face_high": [
+          0.300706,
+          0.0,
+          -0.0,
+          0.953717
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.44493,
+          1.61952
+        ],
+        "target": [
+          0.0,
+          0.15937,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.6445
+        }
+      },
+      "copyKey": "watch",
+      "shadow": {
+        "file": "shadows/watch.webp",
+        "center": [
+          0.0,
+          0.025
+        ],
+        "size": [
+          0.33324,
+          0.494
+        ],
+        "y": -0.13032
+      },
+      "display": {
+        "scale": 0.9023,
+        "offset": [
+          -0.0368,
+          0.0471
+        ]
+      }
+    },
+    "airpods": {
+      "index": 5,
+      "files": {
+        "carousel": "models/airpods.glb",
+        "detail": "models/airpods_detail.glb"
+      },
+      "pivotOffset": [
+        0.0,
+        0.1085,
+        -0.0
+      ],
+      "displayScale": 3.1,
+      "snapPoses": {
+        "front": [
+          0.0,
+          0.0,
+          -0.0,
+          1.0
+        ],
+        "face_left": [
+          0.0,
+          -0.300706,
+          -0.0,
+          0.953717
+        ],
+        "face_right": [
+          0.0,
+          0.300706,
+          -0.0,
+          0.953717
+        ],
+        "top_down": [
+          0.34202,
+          0.0,
+          -0.0,
+          0.939693
+        ],
+        "back": [
+          -0.0,
+          1.0,
+          -0.0,
+          -0.0
+        ]
+      },
+      "defaultPose": "front",
+      "detailCamera": {
+        "position": [
+          0.0,
+          0.36901,
+          1.34318
+        ],
+        "target": [
+          0.0,
+          0.13217,
+          -0.0
+        ],
+        "fovVertical": 16.461,
+        "lensMm": 70,
+        "sensorWidthMm": 36,
+        "spherical": {
+          "yawDeg": 0,
+          "elevationDeg": 10,
+          "distance": 1.3639
+        }
+      },
+      "copyKey": "airpods",
+      "shadow": {
+        "file": "shadows/airpods.webp",
+        "center": [
+          0.0,
+          0.025
+        ],
+        "size": [
+          0.33913,
+          0.34363
+        ],
+        "y": -0.108
+      },
+      "display": {
+        "scale": 1.0963,
+        "offset": [
+          -0.0281,
+          0.036
+        ]
+      }
+    }
+  },
+  "credits": [
+    {
+      "model": "MacBook Pro 14-inch M5",
+      "author": "Apple User",
+      "license": "Sketchfab Free Standard"
+    },
+    {
+      "model": "MacBook Neo",
+      "author": "Ranguel",
+      "license": "CC BY 4.0"
+    },
+    {
+      "model": "MacBook Pro M3 16-inch 2024",
+      "author": "jackbaeten",
+      "license": "CC BY 4.0"
+    },
+    {
+      "model": "iMac 2021",
+      "author": "DatSketch",
+      "license": "CC BY 4.0"
+    },
+    {
+      "model": "iPhone 17 Pro",
+      "author": "Ranguel",
+      "license": "CC BY 4.0"
+    },
+    {
+      "model": "Apple Watch Ultra 2",
+      "author": "polyman Studio",
+      "license": "CC BY 4.0"
+    },
+    {
+      "model": "AirPods (3e g\u00e9n\u00e9ration)",
+      "author": "polyman Studio",
+      "license": "CC BY 4.0"
+    }
+  ]
+}
