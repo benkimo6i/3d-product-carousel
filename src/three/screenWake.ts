@@ -37,8 +37,13 @@ export function loadScreenImage(url: string): Promise<Texture> {
 }
 
 /**
- * Lets a screen material crossfade from its wallpaper to the mock desktop. Its glow (emissive) and
- * base colour both blend to the new image; mid-blend the screen dims slightly, like a display waking.
+ * Lets a screen material crossfade from its wallpaper to the mock desktop: its glow (emissive) blends
+ * to the new image, and mid-blend the screen dims slightly, like a display waking. Two things would
+ * wash the desktop out, so both fade away as the screen wakes:
+ * - the Neo's and iPhone's screens also have a lit base colour (the wallpaper again), which fades to
+ *   black, like the other screens';
+ * - the scene's filmic tone mapping compresses and desaturates bright colours, which flatters the
+ *   products but mutes a screen image that already holds its final colours, so it's skipped.
  */
 export function patchScreenMaterial(material: Material, uniforms: ScreenUniforms) {
   material.onBeforeCompile = (shader) => {
@@ -57,9 +62,7 @@ void main() {`,
       .replace(
         '#include <map_fragment>',
         /* glsl */ `#include <map_fragment>
-#ifdef USE_MAP
-  diffuseColor.rgb = mix(diffuseColor.rgb, diffuse * screenWakeColor(vMapUv), screenWake);
-#endif`,
+  diffuseColor.rgb *= 1.0 - screenWake;`,
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -68,6 +71,12 @@ void main() {`,
   totalEmissiveRadiance = mix(totalEmissiveRadiance, emissive * screenWakeColor(vEmissiveMapUv), screenWake);
   totalEmissiveRadiance *= 1.0 - 0.35 * sin(3.14159265 * screenWake);
 #endif`,
+      )
+      .replace(
+        '#include <tonemapping_fragment>',
+        /* glsl */ `vec3 screenUntoned = gl_FragColor.rgb;
+#include <tonemapping_fragment>
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, screenUntoned, screenWake);`,
       )
   }
   material.customProgramCacheKey = () => 'screen-wake'
