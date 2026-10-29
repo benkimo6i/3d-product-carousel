@@ -779,6 +779,17 @@
           -0.0368,
           0.0471
         ]
+      },
+      "screen": {
+        "material": "edYkGGAdRWeopLP",
+        "uv": [
+          0,
+          1,
+          1,
+          0
+        ],
+        "image": "screens/watch-face.webp",
+        "live": "watch"
       }
     },
     "airpods": {
