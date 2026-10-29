@@ -38,14 +38,14 @@ export function loadScreenImage(url: string): Promise<Texture> {
 
 /**
  * Lets a screen material crossfade from its wallpaper to the mock desktop: its glow (emissive) blends
- * to the new image, and mid-blend the screen dims slightly, like a display waking. Two things would
- * wash the desktop out, so both fade away as the screen wakes:
- * - the Neo's and iPhone's screens also have a lit base colour (the wallpaper again), which fades to
- *   black, like the other screens';
- * - the scene's filmic tone mapping compresses and desaturates bright colours, which flatters the
- *   products but mutes a screen image that already holds its final colours, so it's skipped.
+ * to the new image, and mid-blend the screen dims slightly, like a display waking.
+ *
+ * Screens skip the scene's filmic tone mapping: it flatters the products but compresses and
+ * desaturates a screen image that already holds its final colours. Wallpaper and desktop are both
+ * untoned, so toggling doesn't shift the background.
  */
 export function patchScreenMaterial(material: Material, uniforms: ScreenUniforms) {
+  material.toneMapped = false
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms)
     shader.fragmentShader = shader.fragmentShader
@@ -60,23 +60,12 @@ vec3 screenWakeColor(vec2 uv) {
 void main() {`,
       )
       .replace(
-        '#include <map_fragment>',
-        /* glsl */ `#include <map_fragment>
-  diffuseColor.rgb *= 1.0 - screenWake;`,
-      )
-      .replace(
         '#include <emissivemap_fragment>',
         /* glsl */ `#include <emissivemap_fragment>
 #ifdef USE_EMISSIVEMAP
   totalEmissiveRadiance = mix(totalEmissiveRadiance, emissive * screenWakeColor(vEmissiveMapUv), screenWake);
   totalEmissiveRadiance *= 1.0 - 0.35 * sin(3.14159265 * screenWake);
 #endif`,
-      )
-      .replace(
-        '#include <tonemapping_fragment>',
-        /* glsl */ `vec3 screenUntoned = gl_FragColor.rgb;
-#include <tonemapping_fragment>
-  gl_FragColor.rgb = mix(gl_FragColor.rgb, screenUntoned, screenWake);`,
       )
   }
   material.customProgramCacheKey = () => 'screen-wake'
