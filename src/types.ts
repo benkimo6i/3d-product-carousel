@@ -55,6 +55,11 @@ export interface CaseDef {
    * turned inwards into its cup.
    */
   buds: { node: string; hover: { position: Vec3; quaternion: Quat }; seat: { position: Vec3; quaternion: Quat } }[]
+  /**
+   * How far the AirPods rise as they close (metres, model units): the closed case is much shorter
+   * than the open case with the buds above it, so it moves up to the same vertical centre.
+   */
+  lift: number
 }
 
 export interface ProductDef {

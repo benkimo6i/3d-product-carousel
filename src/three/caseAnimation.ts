@@ -31,6 +31,8 @@ const LID_CATCH = 0.85
 const LID_REBOUND = 0.035
 /** Share of a bud's time spent lining up over its hole (the rest is the slide in). */
 const LINE_UP = 0.4
+/** The AirPods rise from when the first bud starts sliding in until the lid lands. */
+const RISE: [number, number] = [s(1.2 * 0.4), s(1.45 + 0.9 - 1.2 * 0.4)]
 /** How far past its seat (share of the slide) a bud dips before settling. */
 const SETTLE = 0.02
 
@@ -46,6 +48,11 @@ interface Pose {
   quaternion: Quaternion
 }
 
+/** How far through its rise the product is at timeline position `t` (0 to 1). */
+export function caseRise(t: number): number {
+  return easeInOut(part(t, ...RISE))
+}
+
 interface Bud {
   node: Object3D
   rest: Pose
@@ -54,7 +61,7 @@ interface Bud {
 }
 
 export interface CaseRig {
-  /** Poses the buds for timeline position `t`. */
+  /** Poses the buds, and raises the whole product, for timeline position `t`. */
   pose: (t: number) => void
   /** Status light: 0 normal, 1 full glow. */
   setLight: (glow: number) => void
@@ -80,11 +87,16 @@ export function createCaseRig(root: Object3D, def: CaseDef, materials: MeshStand
     buds.push(bud)
   }
   const glow = (m: MeshStandardMaterial) => (m.emissive && !m.emissiveMap ? Math.max(m.emissive.r, m.emissive.g, m.emissive.b) : 0)
+  // The node the buds hang from: the whole product, which rises as it closes.
+  const body = buds[0].node.parent
+  const bodyRest = body ? { position: body.position.clone(), quaternion: body.quaternion.clone() } : null
+  if (body) body.userData.rest = bodyRest
   const light = materials.reduce<MeshStandardMaterial | undefined>((best, m) => (glow(m) > (best ? glow(best) : 0.005) ? m : best), undefined)
   const lightBase = light?.emissiveIntensity ?? 1
 
   return {
     pose(t) {
+      if (body && bodyRest) body.position.y = bodyRest.position.y + def.lift * caseRise(t)
       buds.forEach((b, i) => {
         const p = part(t, ...BUDS[i])
         if (p < LINE_UP) {

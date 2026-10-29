@@ -68,7 +68,7 @@ const isInside = (o: Object3D, root: Object3D) => {
 
 /**
  * Runs `fn` with the product in its rest pose: any lid fully open, and the AirPods' buds out of
- * the case. The framing is measured at rest so the camera holds still while they move (and the two
+ * the case (and the case at its resting height). The framing is measured at rest so the camera holds still while they move (and the two
  * MacBook Pros share the 16"'s framing, measured open even while the 16" sits closed behind the 14").
  */
 function withRestPose<T>(key: string, root: Object3D, def: ProductDef, fn: () => T): T {
@@ -82,6 +82,8 @@ function withRestPose<T>(key: string, root: Object3D, def: ProductDef, fn: () =>
   let buds = budPivots.get(key)
   if (def.case && (!buds?.[0] || !isInside(buds[0], root))) {
     buds = def.case.buds.map((b) => root.getObjectByName(b.node)).filter((o): o is Object3D => !!o?.userData.rest)
+    // ...and the product body they hang from, which rises as the case closes.
+    if (buds[0]?.parent?.userData.rest) buds.push(buds[0].parent)
     budPivots.set(key, buds)
   }
   if (!hinge && !buds?.length) return fn()
