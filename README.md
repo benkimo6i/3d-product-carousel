@@ -19,7 +19,8 @@ Product names and copy are placeholders; not affiliated with Apple.
   the product. Drag to rotate it freely; on release it settles into the nearest good angle.
 - **Switch products in place**: step to the next product without leaving the details view.
 - **Screens that wake up**: click a Mac or the iPhone in the details view and its wallpaper gives way
-  to a mock desktop of this project being built (the site in a browser, the code, the 3D scene).
+  to a mock desktop: creative apps on the Pros and iMac (design tool, photo editor, video editor),
+  everyday apps on the Neo and iPhone.
 - **MacBook Pro 14"/16" toggle**: the open lid closes, the machines crossfade and the other lid
   opens, shown at their real relative sizes.
 - **Responsive layouts**: a three-column print-ad layout on desktop, product beside a scrolling copy
