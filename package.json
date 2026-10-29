@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "optimize": "node scripts/optimize-models.mjs",
-    "postinstall": "node scripts/copy-decoders.mjs"
+    "postinstall": "node scripts/copy-decoders.mjs",
+    "screens": "node scripts/render-screens.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

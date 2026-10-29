@@ -28,6 +28,20 @@ export interface ShadowDef {
   y: number
 }
 
+/** A display that can show a mock desktop (click the product in details to toggle it). */
+export interface ScreenDef {
+  /** Material of the screen surface (its emissive map is the wallpaper). */
+  material: string
+  /**
+   * Part of the screen texture's UV space the display covers: [u0, v0, u1, v1] for the image's
+   * top-left and bottom-right corners (glTF UVs, v down). A model whose screen UVs run backwards
+   * lists that range reversed (the iMac's and 16" MacBook Pro's v, the iPhone's u).
+   */
+  uv: [number, number, number, number]
+  /** The mock desktop image, at the display's aspect ratio (rendered by `npm run screens`). */
+  image: string
+}
+
 export interface ProductDef {
   index: number
   files: { carousel: string; detail: string }
@@ -46,6 +60,7 @@ export interface ProductDef {
    * chosen so every product sits centred and similarly sized under one fixed camera.
    */
   display?: { scale: number; offset: [number, number] }
+  screen?: ScreenDef
 }
 
 export interface Credit {

@@ -25,6 +25,8 @@ interface State {
   loadable: number[]
   /** Detail models fetched and warmed up in the background, ahead of opening them. */
   prefetch: string[]
+  /** Details: the product's screen shows its mock desktop instead of the wallpaper. */
+  screenOn: boolean
   setNearest: (nearest: number, settled: boolean) => void
   setHintDismissed: (dismissed: boolean) => void
   setCopyKey: (key: string | null) => void
@@ -32,6 +34,7 @@ interface State {
   setMode: (mode: Mode) => void
   setDetailKey: (key: string | null) => void
   setMbpSize: (size: MbpSize) => void
+  setScreenOn: (on: boolean) => void
 }
 
 export const useStore = create<State>()((set) => ({
@@ -47,6 +50,7 @@ export const useStore = create<State>()((set) => ({
   swapPhase: 'idle',
   loadable: [0],
   prefetch: [],
+  screenOn: false,
   setNearest: (nearest, settled) => set({ nearest, settled }),
   setHintDismissed: (hintDismissed) => set({ hintDismissed }),
   setCopyKey: (copyKey) => set({ copyKey }),
@@ -54,6 +58,7 @@ export const useStore = create<State>()((set) => ({
   setMode: (mode) => set({ mode }),
   setDetailKey: (detailKey) => set({ detailKey }),
   setMbpSize: (mbpSize) => set({ mbpSize }),
+  setScreenOn: (screenOn) => set({ screenOn }),
 }))
 
 /** Values read every frame; mutated by GSAP and ScrollTrigger, never trigger React renders. */

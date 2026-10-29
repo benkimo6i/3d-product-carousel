@@ -4,9 +4,10 @@ import { Frustum, MathUtils, Matrix4, Sphere, Vector3, type Camera, type Group, 
 import { FADE_PASS_ORDER, Model, type LoadedModel } from './Model'
 import { BakedShadow, type ShadowTuning } from './BakedShadow'
 import { motion, productDisplays, productRoots, useStore } from '../store'
-import { openDetail, scrollToSlot } from '../actions'
+import { openDetail, scrollToSlot, toggleScreen } from '../actions'
 import { slotReady } from './loadQueue'
 import { mbp } from '../mbpSwap'
+import { loadScreenImage, patchScreenMaterial, screenUniforms } from './screenWake'
 import type { ProductDef } from '../types'
 
 interface Props {
@@ -16,6 +17,11 @@ interface Props {
 }
 
 const isMbp = (key: string | null) => key === 'mbp14' || key === 'mbp16'
+/** The product shown in details (either MacBook Pro counts for both: they swap in place). */
+const isDetailProduct = (pkey: string, detailKey: string | null) =>
+  pkey === detailKey || (isMbp(pkey) && isMbp(detailKey))
+/** Pointer travel (px) below which a press on the product counts as a click rather than a drag. */
+const CLICK_SLOP_PX = 4
 
 /** Peak opacity of the baked floor shadows ("medium"). */
 const SHADOW_STRENGTH = 0.7
@@ -64,8 +70,12 @@ export function Product({ pkey, def, slot }: Props) {
   const group = useRef<Group>(null)
   const model = useRef<LoadedModel | null>(null)
   const hinge = useRef<Object3D | null>(null)
-  const state = useRef({ visibility: 1, lid: def.lid?.defaultState === 'closed' ? 0 : 1 })
+  const state = useRef({ visibility: 1, lid: def.lid?.defaultState === 'closed' ? 0 : 1, wake: 0 })
   const manifest = useStore((s) => s.manifest)
+  // Screen products: both model versions' screen materials share these, so the state survives a swap.
+  const screen = useRef(
+    def.screen ? { uniforms: screenUniforms(def.screen), loading: false, ready: false } : null,
+  ).current
 
   // Both MacBook Pros share the 14"'s spot (the swap crossfades between them in place).
   const spot = useRef(
@@ -95,9 +105,13 @@ export function Product({ pkey, def, slot }: Props) {
     (m: LoadedModel) => {
       model.current = m
       hinge.current = def.lid ? m.root.getObjectByName(def.lid.node) ?? null : null
+      if (screen && def.screen) {
+        const mat = m.materials.find((x) => x.name === def.screen!.material)
+        if (mat) patchScreenMaterial(mat, screen.uniforms)
+      }
       slotReady(slot)
     },
-    [def.lid, slot],
+    [def.lid, def.screen, screen, slot],
   )
 
   useEffect(() => {
@@ -150,6 +164,26 @@ export function Product({ pkey, def, slot }: Props) {
 
     if (def.lid && hinge.current) hinge.current.rotation.x = def.lid.closedAngleRad * (1 - s.lid)
 
+    // Screen: the mock desktop loads as soon as details opens on this product, then fades in and
+    // out with the toggle.
+    if (screen && def.screen) {
+      const { mode, detailKey, screenOn } = useStore.getState()
+      const here = mode === 'detail' && isDetailProduct(pkey, detailKey)
+      if (here && !screen.loading) {
+        screen.loading = true
+        loadScreenImage(`${import.meta.env.BASE_URL}${def.screen.image}`).then((t) => {
+          screen.uniforms.screenWakeMap.value = t
+          screen.ready = true
+          invalidate()
+        })
+      }
+      const wakeGoal = here && screenOn && screen.ready ? 1 : 0
+      s.wake = MathUtils.damp(s.wake, wakeGoal, 7, dt)
+      if (Math.abs(s.wake - wakeGoal) > 0.002) invalidate()
+      else s.wake = wakeGoal
+      screen.uniforms.screenWake.value = s.wake
+    }
+
     // Baked shadows: follow the product's visibility, blend open/closed with the lid, and fade out
     // as the details view opens (the product rotates freely there, which a baked shadow can't follow).
     const shadowAlpha = SHADOW_STRENGTH * opacity * (1 - motion.detail)
@@ -165,7 +199,13 @@ export function Product({ pkey, def, slot }: Props) {
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
-    const { mode, nearest, settled } = useStore.getState()
+    const { mode, nearest, settled, detailKey } = useStore.getState()
+    if (mode === 'detail') {
+      // A click (not the end of a drag) on the product in details toggles its screen.
+      const click = e.delta <= CLICK_SLOP_PX
+      if (click && isDetailProduct(pkey, detailKey) && motion.detail >= 0.98 && !mbp.swapping) toggleScreen()
+      return
+    }
     if (mode !== 'carousel') return
     if (nearest !== slot || !settled) {
       scrollToSlot(slot)
@@ -175,7 +215,10 @@ export function Product({ pkey, def, slot }: Props) {
   }
 
   const setCursor = (pointer: boolean) => {
-    if (useStore.getState().mode === 'carousel') document.body.style.cursor = pointer ? 'pointer' : ''
+    const { mode, detailKey } = useStore.getState()
+    // In details, only a product with a screen to toggle is clickable.
+    const clickable = mode === 'carousel' || (mode === 'detail' && !!def.screen && isDetailProduct(pkey, detailKey))
+    if (clickable || !pointer) document.body.style.cursor = pointer ? 'pointer' : ''
   }
 
   const lod = <Model url={def.files.carousel} onReady={onReady} />

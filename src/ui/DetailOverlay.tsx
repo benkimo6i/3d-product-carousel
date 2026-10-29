@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motionScale, useStore } from '../store'
-import { closeDetail, detailStep } from '../actions'
+import { closeDetail, detailStep, toggleScreen } from '../actions'
 import { SizeToggle } from './SizeToggle'
 import { TABLET_MAX_WIDTH } from '../three/detailFraming'
 import type { CopyBlock, ProductCopy } from '../types'
@@ -70,7 +70,7 @@ function useBlockFade(sheet: React.RefObject<HTMLDivElement | null>, active: boo
 
 /** Print-ad layout around the product: headline on top, copy columns either side, footnote below. */
 export function DetailOverlay() {
-  const { mode, copyKey, copy, hintDismissed, swapPhase } = useStore()
+  const { mode, copyKey, copy, hintDismissed, swapPhase, manifest, screenOn } = useStore()
   const closeButton = useRef<HTMLButtonElement>(null)
   const lastKey = useRef<string | null>(null)
   const sheet = useRef<HTMLDivElement>(null)
@@ -141,6 +141,7 @@ export function DetailOverlay() {
   if (!key) return null
   const c: ProductCopy = copy.products[key]
   const isMbp = key === 'mbp14' || key === 'mbp16'
+  const hasScreen = !!manifest.products[key]?.screen
 
   return (
     <div
@@ -210,6 +211,13 @@ export function DetailOverlay() {
       >
         Drag to interact
       </p>
+      {/* Clicking the product toggles its screen; this is the keyboard / screen-reader way to, shown
+          only while focused. */}
+      {hasScreen && (
+        <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleScreen}>
+          Show desktop on screen
+        </button>
+      )}
     </div>
   )
 }

@@ -32,6 +32,7 @@ export function openDetail(key: string) {
   s.setCopyKey(key)
   s.setSwapPhase('idle')
   s.setHintDismissed(false)
+  s.setScreenOn(false)
   s.setMode('detail')
   // If the page is only part-way into the section, glide it fully into place during the arc,
   // otherwise the scroll lock would leave part of the details layout off-screen.
@@ -48,6 +49,7 @@ export function closeDetail() {
   const root = productRoots.get(s.detailKey)
   if (root) tweenQuaternion(root.quaternion, new Quaternion(), 0.8 * motionScale(), 'power2.inOut')
   s.setMode('closing')
+  s.setScreenOn(false)
   gsap.to(motion, {
     detail: 0,
     duration: 1.5 * motionScale(),
@@ -94,6 +96,13 @@ export function setMbpSize(size: '14' | '16') {
   })
 }
 
+/** Details: toggles the product's screen between its wallpaper and the mock desktop. */
+export function toggleScreen() {
+  const s = useStore.getState()
+  if (s.mode !== 'detail' || !s.detailKey || !s.manifest.products[s.detailKey].screen) return
+  s.setScreenOn(!s.screenOn)
+}
+
 export function slotOf(key: string): number {
   const { order, slots } = useStore.getState().manifest.carousel
   return order.findIndex((name) => slots[name].includes(key))
@@ -124,6 +133,7 @@ export function detailStep(dir: 1 | -1) {
   if (prev) tweenQuaternion(prev.quaternion, new Quaternion(), 0.5, 'power2.inOut')
   s.setSwapPhase('out')
   s.setHintDismissed(false)
+  s.setScreenOn(false)
   s.setDetailKey(key)
   goToSlot(next)
   gsap
