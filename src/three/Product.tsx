@@ -1,14 +1,26 @@
 import { Suspense, useCallback, useEffect, useRef } from 'react'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
-import { Frustum, MathUtils, Matrix4, Sphere, Vector3, type Camera, type Group, type MeshBasicMaterial, type Object3D } from 'three'
+import {
+  Frustum,
+  MathUtils,
+  Matrix4,
+  Sphere,
+  Vector3,
+  type Camera,
+  type Group,
+  type MeshBasicMaterial,
+  type MeshStandardMaterial,
+  type Object3D,
+} from 'three'
 import { FADE_PASS_ORDER, Model, type LoadedModel } from './Model'
 import { BakedShadow, type ShadowTuning } from './BakedShadow'
 import { motion, motionScale, productDisplays, productRoots, useStore } from '../store'
-import { openDetail, scrollToSlot, toggleScreen } from '../actions'
+import { openDetail, scrollToSlot, toggleProduct } from '../actions'
 import { slotReady } from './loadQueue'
 import { mbp } from '../mbpSwap'
 import { loadScreenImage, patchScreenMaterial, screenUniforms } from './screenWake'
 import { createWatchFaceAnimation, type WatchFaceAnimation } from './watchFace'
+import { CASE_DURATION, createCaseRig, lidClosed, type CaseRig } from './caseAnimation'
 import type { ProductDef } from '../types'
 
 interface Props {
@@ -23,6 +35,10 @@ const isDetailProduct = (pkey: string, detailKey: string | null) =>
   pkey === detailKey || (isMbp(pkey) && isMbp(detailKey))
 /** Pointer travel (px) below which a press on the product counts as a click rather than a drag. */
 const CLICK_SLOP_PX = 4
+/** AirPods: how long the status light glows once the lid shuts (s), and how much faster the case
+ *  opens again when you leave details (so it's done before the camera is back). */
+const LIGHT_BLINK_S = 0.9
+const CASE_LEAVE_SPEED = 2.4
 
 /** Peak opacity of the baked floor shadows ("medium"). */
 const SHADOW_STRENGTH = 0.7
@@ -71,7 +87,9 @@ export function Product({ pkey, def, slot }: Props) {
   const group = useRef<Group>(null)
   const model = useRef<LoadedModel | null>(null)
   const hinge = useRef<Object3D | null>(null)
-  const state = useRef({ visibility: 1, lid: def.lid?.defaultState === 'closed' ? 0 : 1, wake: 0 })
+  // AirPods: the bud pivots and status light in the detailed model (the carousel model has none).
+  const caseRig = useRef<CaseRig | null>(null)
+  const state = useRef({ visibility: 1, lid: def.lid?.defaultState === 'closed' ? 0 : 1, wake: 0, caseT: 0, blinkAt: -1 })
   const manifest = useStore((s) => s.manifest)
   // Screen products: both model versions' screen materials share these, so the state survives a swap.
   const screen = useRef(
@@ -108,13 +126,14 @@ export function Product({ pkey, def, slot }: Props) {
     (m: LoadedModel) => {
       model.current = m
       hinge.current = def.lid ? m.root.getObjectByName(def.lid.node) ?? null : null
+      caseRig.current = def.case ? createCaseRig(m.root, def.case, m.materials as MeshStandardMaterial[]) : null
       if (screen && def.screen) {
         const mat = m.materials.find((x) => x.name === def.screen!.material)
         if (mat) patchScreenMaterial(mat, screen.uniforms)
       }
       slotReady(slot)
     },
-    [def.lid, def.screen, screen, slot],
+    [def.lid, def.screen, def.case, screen, slot],
   )
 
   useEffect(() => {
@@ -126,7 +145,10 @@ export function Product({ pkey, def, slot }: Props) {
     }
   }, [pkey])
 
-  useFrame(({ invalidate, camera, clock }, dt) => {
+  useFrame(({ invalidate, camera, clock }, frameDt) => {
+    // The canvas renders on demand, so the first frame after a pause reports the whole pause; cap it
+    // so animations that start then (a screen waking, the case closing) play from the beginning.
+    const dt = Math.min(frameDt, 1 / 20)
     const g = group.current
     const m = model.current
     const d = displayGroup.current
@@ -165,6 +187,25 @@ export function Product({ pkey, def, slot }: Props) {
       for (const mesh of m.meshes) mesh.renderOrder = (solid ? 0 : FADE_PASS_ORDER) + mesh.userData.drawOrder
     }
 
+    // AirPods: the case timeline runs towards closed while it's toggled on in details, and back open
+    // otherwise (quicker when leaving, so it's done before the camera is back). It drives the lid.
+    if (def.case) {
+      const { mode, detailKey, screenOn } = useStore.getState()
+      const here = mode === 'detail' && pkey === detailKey
+      const goalT = here && screenOn && caseRig.current ? 1 : 0
+      const step = (dt / (CASE_DURATION * motionScale())) * (here ? 1 : CASE_LEAVE_SPEED)
+      const was = s.caseT
+      s.caseT = goalT > s.caseT ? Math.min(goalT, s.caseT + step) : Math.max(goalT, s.caseT - step)
+      if (s.caseT !== goalT) invalidate()
+      if (was < 1 && s.caseT === 1) s.blinkAt = clock.elapsedTime
+      caseRig.current?.pose(s.caseT)
+      s.lid = 1 - lidClosed(s.caseT)
+      // The status light glows up and fades once the lid has shut.
+      const blink = s.blinkAt < 0 ? 1 : (clock.elapsedTime - s.blinkAt) / LIGHT_BLINK_S
+      caseRig.current?.setLight(blink < 1 && s.caseT === 1 ? Math.sin(Math.PI * blink) : 0)
+      if (blink < 1) invalidate()
+    }
+
     if (def.lid && hinge.current) hinge.current.rotation.x = def.lid.closedAngleRad * (1 - s.lid)
 
     // Screen: the mock desktop loads as soon as details opens on this product, then fades in and
@@ -195,13 +236,12 @@ export function Product({ pkey, def, slot }: Props) {
         const playing = screen.anim.update(performance.now())
         if (playing) invalidate()
         s.wake = playing ? 1 : 0
-        screen.uniforms.screenWake.value = s.wake
-        return
+      } else {
+        const wakeGoal = here && screenOn && screen.ready ? 1 : 0
+        s.wake = MathUtils.damp(s.wake, wakeGoal, 7, dt)
+        if (Math.abs(s.wake - wakeGoal) > 0.002) invalidate()
+        else s.wake = wakeGoal
       }
-      const wakeGoal = here && screenOn && screen.ready ? 1 : 0
-      s.wake = MathUtils.damp(s.wake, wakeGoal, 7, dt)
-      if (Math.abs(s.wake - wakeGoal) > 0.002) invalidate()
-      else s.wake = wakeGoal
       screen.uniforms.screenWake.value = s.wake
     }
 
@@ -222,9 +262,9 @@ export function Product({ pkey, def, slot }: Props) {
     e.stopPropagation()
     const { mode, nearest, settled, detailKey } = useStore.getState()
     if (mode === 'detail') {
-      // A click (not the end of a drag) on the product in details toggles its screen.
+      // A click (not the end of a drag) on the product in details: its screen, face or case.
       const click = e.delta <= CLICK_SLOP_PX
-      if (click && isDetailProduct(pkey, detailKey) && motion.detail >= 0.98 && !mbp.swapping) toggleScreen()
+      if (click && isDetailProduct(pkey, detailKey) && motion.detail >= 0.98 && !mbp.swapping) toggleProduct()
       return
     }
     if (mode !== 'carousel') return
@@ -237,8 +277,8 @@ export function Product({ pkey, def, slot }: Props) {
 
   const setCursor = (pointer: boolean) => {
     const { mode, detailKey } = useStore.getState()
-    // In details, only a product with a screen to toggle is clickable.
-    const clickable = mode === 'carousel' || (mode === 'detail' && !!def.screen && isDetailProduct(pkey, detailKey))
+    // In details, only a product that does something on click is clickable.
+    const clickable = mode === 'carousel' || (mode === 'detail' && !!(def.screen || def.case) && isDetailProduct(pkey, detailKey))
     if (clickable || !pointer) document.body.style.cursor = pointer ? 'pointer' : ''
   }
 

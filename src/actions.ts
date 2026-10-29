@@ -97,14 +97,14 @@ export function setMbpSize(size: '14' | '16') {
 }
 
 /**
- * Details: toggles the product's screen between its wallpaper and the mock desktop (the Watch
- * replays its face animation instead).
+ * Details: what clicking the product does. Macs and iPhone toggle the mock desktop, the Watch
+ * replays its face animation, and the AirPods go into (or come out of) their case.
  */
-export function toggleScreen() {
+export function toggleProduct() {
   const s = useStore.getState()
-  const screen = s.mode === 'detail' && s.detailKey ? s.manifest.products[s.detailKey].screen : undefined
-  if (!screen) return
-  if (screen.live === 'watch') s.replayScreen()
+  const def = s.mode === 'detail' && s.detailKey ? s.manifest.products[s.detailKey] : undefined
+  if (!def?.screen && !def?.case) return
+  if (def.screen?.live === 'watch') s.replayScreen()
   else s.setScreenOn(!s.screenOn)
 }
 

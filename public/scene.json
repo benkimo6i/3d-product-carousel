@@ -876,6 +876,76 @@
           -0.0281,
           0.036
         ]
+      },
+      "lid": {
+        "node": "airpods_LidHinge",
+        "axis": "x",
+        "restState": "open",
+        "closedAngleRad": 1.91637,
+        "defaultState": "open"
+      },
+      "case": {
+        "buds": [
+          {
+            "node": "airpods_BudLPivot",
+            "hover": {
+              "position": [
+                -0.04592,
+                0.01794,
+                0.00914
+              ],
+              "quaternion": [
+                -0.08421,
+                -0.00115,
+                0.02583,
+                0.99611
+              ]
+            },
+            "seat": {
+              "position": [
+                -0.04414,
+                -0.07066,
+                0.01024
+              ],
+              "quaternion": [
+                -0.07734,
+                0.30708,
+                0.0472,
+                0.94736
+              ]
+            }
+          },
+          {
+            "node": "airpods_BudRPivot",
+            "hover": {
+              "position": [
+                0.04582,
+                0.01794,
+                0.00909
+              ],
+              "quaternion": [
+                -0.1021,
+                0.0014,
+                -0.03066,
+                0.9943
+              ]
+            },
+            "seat": {
+              "position": [
+                0.04408,
+                -0.07057,
+                0.01014
+              ],
+              "quaternion": [
+                -0.09285,
+                -0.30637,
+                -0.05733,
+                0.94564
+              ]
+            }
+          }
+        ],
+        "lift": 0.0408
       }
     }
   },

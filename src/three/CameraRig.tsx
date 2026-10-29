@@ -6,7 +6,7 @@ import { restingScreenRect } from './restingBox'
 import { centringShift } from './carouselCentering'
 import { activeKey, motion, productRoots, useStore } from '../store'
 import { detailSwitch, slotOf } from '../actions'
-import type { CameraDef } from '../types'
+import type { CameraDef, ProductDef } from '../types'
 
 /** Aspect the Blender cameras were framed for. */
 const DESIGN_ASPECT = 16 / 9
@@ -59,6 +59,7 @@ function poseCamera(cam: PerspectiveCamera, orbit: Orbit, like: PerspectiveCamer
   cam.lookAt(orbit.target)
 }
 const lidHinges = new Map<string, Object3D | null>()
+const budPivots = new Map<string, Object3D[]>()
 
 const isInside = (o: Object3D, root: Object3D) => {
   for (let p: Object3D | null = o; p; p = p.parent) if (p === root) return true
@@ -66,25 +67,41 @@ const isInside = (o: Object3D, root: Object3D) => {
 }
 
 /**
- * Runs `fn` with the MacBook's lid set fully open. The two MacBook Pros share the 16"'s framing,
- * which must be measured open even while the 16" sits closed behind the 14".
+ * Runs `fn` with the product in its rest pose: any lid fully open, and the AirPods' buds out of
+ * the case (and the case at its resting height). The framing is measured at rest so the camera holds still while they move (and the two
+ * MacBook Pros share the 16"'s framing, measured open even while the 16" sits closed behind the 14").
  */
-function withLidOpen<T>(key: string, root: Object3D, node: string | undefined, fn: () => T): T {
-  if (!node) return fn()
+function withRestPose<T>(key: string, root: Object3D, def: ProductDef, fn: () => T): T {
+  // The model swaps between its carousel and detailed versions; nodes from the other one still
+  // have a parent (inside its cached scene) but no longer move this product.
   let hinge = lidHinges.get(key)
-  // The model swaps between its carousel and detailed versions; a hinge from the other one still
-  // has a parent (inside its cached scene) but no longer moves this product's lid.
-  if (!hinge || !isInside(hinge, root)) {
-    hinge = root.getObjectByName(node) ?? null
+  if (def.lid && (!hinge || !isInside(hinge, root))) {
+    hinge = root.getObjectByName(def.lid.node) ?? null
     lidHinges.set(key, hinge)
   }
-  if (!hinge) return fn()
-  const angle = hinge.rotation.x
-  hinge.rotation.x = 0
+  let buds = budPivots.get(key)
+  if (def.case && (!buds?.[0] || !isInside(buds[0], root))) {
+    buds = def.case.buds.map((b) => root.getObjectByName(b.node)).filter((o): o is Object3D => !!o?.userData.rest)
+    // ...and the product body they hang from, which rises as the case closes.
+    if (buds[0]?.parent?.userData.rest) buds.push(buds[0].parent)
+    budPivots.set(key, buds)
+  }
+  if (!hinge && !buds?.length) return fn()
+  const angle = hinge?.rotation.x ?? 0
+  const posed = (buds ?? []).map((b) => ({ b, p: b.position.clone(), q: b.quaternion.clone() }))
+  if (hinge) hinge.rotation.x = 0
+  for (const { b } of posed) {
+    b.position.copy(b.userData.rest.position)
+    b.quaternion.copy(b.userData.rest.quaternion)
+  }
   try {
     return fn()
   } finally {
-    hinge.rotation.x = angle
+    if (hinge) hinge.rotation.x = angle
+    for (const { b, p, q } of posed) {
+      b.position.copy(p)
+      b.quaternion.copy(q)
+    }
     root.updateMatrixWorld(true)
   }
 }
@@ -176,7 +193,7 @@ export function CameraRig() {
       if (!root) return null
       root.getWorldPosition(tmpPivot)
       const goal = fromDef(def.detailCamera, tmpPivot.clone())
-      const solved = withLidOpen(frameKey, root, def.lid?.node, () =>
+      const solved = withRestPose(frameKey, root, def, () =>
         solveDetailFraming(root, camera, size.width, size.height, goal.yaw, goal.elevation, into),
       )
       const settleOffsetX = (slotOf(key) - motion.progress) * manifest.carousel.spacing

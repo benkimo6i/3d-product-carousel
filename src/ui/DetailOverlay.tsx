@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motionScale, useStore } from '../store'
-import { closeDetail, detailStep, toggleScreen } from '../actions'
+import { closeDetail, detailStep, toggleProduct } from '../actions'
 import { SizeToggle } from './SizeToggle'
 import { TABLET_MAX_WIDTH } from '../three/detailFraming'
 import type { CopyBlock, ProductCopy } from '../types'
@@ -142,6 +142,7 @@ export function DetailOverlay() {
   const c: ProductCopy = copy.products[key]
   const isMbp = key === 'mbp14' || key === 'mbp16'
   const screenDef = manifest.products[key]?.screen
+  const hasCase = !!manifest.products[key]?.case
 
   return (
     <div
@@ -211,18 +212,23 @@ export function DetailOverlay() {
       >
         Drag to interact
       </p>
-      {/* Clicking the product toggles its screen; this is the keyboard / screen-reader way to, shown
-          only while focused. */}
-      {screenDef &&
-        (screenDef.live === 'watch' ? (
-          <button className="screen-toggle" onClick={toggleScreen}>
-            Play watch face animation
-          </button>
-        ) : (
-          <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleScreen}>
-            Show desktop on screen
-          </button>
-        ))}
+      {/* Clicking the product toggles its screen, replays the Watch face or closes the AirPods case;
+          this is the keyboard / screen-reader way to, shown only while focused. */}
+      {screenDef?.live === 'watch' && (
+        <button className="screen-toggle" onClick={toggleProduct}>
+          Play watch face animation
+        </button>
+      )}
+      {screenDef && !screenDef.live && (
+        <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleProduct}>
+          Show desktop on screen
+        </button>
+      )}
+      {hasCase && (
+        <button className="screen-toggle" aria-pressed={screenOn} onClick={toggleProduct}>
+          Put AirPods in the case
+        </button>
+      )}
     </div>
   )
 }
