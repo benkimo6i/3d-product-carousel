@@ -5,11 +5,20 @@
   --grey: #636366;
   --link: #0060c0;
   --nav-h: 44px;
+  /* Landscape phones: the sides the notch/island and rounded corners cover (0 elsewhere). Also read
+     by the camera rig. */
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
   --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Body copy never ends on a lone word (browsers without text-wrap: pretty wrap as usual). */
+p {
+  text-wrap: pretty;
 }
 
 /* Read by screen readers, never shown. */
@@ -71,7 +80,7 @@ button {
   max-width: 1000px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 22px;
+  padding: 0 max(22px, var(--safe-r)) 0 max(22px, var(--safe-l));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -123,7 +132,7 @@ button {
 }
 
 .site-footer {
-  padding: 64px 22px 80px;
+  padding: 64px max(22px, var(--safe-r)) 80px max(22px, var(--safe-l));
   max-width: 1000px;
   margin: 0 auto;
   font-size: 12px;
@@ -197,6 +206,23 @@ button {
   color: var(--grey);
   margin: 6px 0 10px;
 }
+/* Landscape phones: a slightly more compact label, and no 14"/16" toggle under it (no room; details
+   still has one). */
+@media (orientation: landscape) and (max-height: 500px) {
+  .carousel-ui {
+    gap: 12px;
+  }
+  .product-label h2 {
+    font-size: 32px;
+  }
+  .product-label p {
+    font-size: 16px;
+    margin: 4px 0 6px;
+  }
+  .carousel-ui .stage-toggle {
+    display: none;
+  }
+}
 @keyframes label-in {
   from {
     opacity: 0;
@@ -253,10 +279,10 @@ button {
   stroke-linejoin: round;
 }
 .nav-arrow.prev {
-  left: max(24px, 3vw);
+  left: max(24px, 3vw, var(--safe-l));
 }
 .nav-arrow.next {
-  right: max(24px, 3vw);
+  right: max(24px, 3vw, var(--safe-r));
 }
 /* Inline row (mobile): a pair of paddles under the product label, inside the label block. */
 .nav-arrows.inline {
@@ -384,7 +410,8 @@ button {
   margin: 0 auto;
   /* On screens too narrow to leave room beside the 1200px block, the sides grow (up to 80px) just
      enough to clear the nav paddles. */
-  padding: 40px clamp(32px, calc(80px - (100vw - 1200px) / 2), 80px);
+  padding: 40px max(clamp(32px, calc(80px - (100vw - 1200px) / 2), 80px), var(--safe-r)) 40px
+    max(clamp(32px, calc(80px - (100vw - 1200px) / 2), 80px), var(--safe-l));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -466,7 +493,7 @@ button {
 .detail-close {
   position: absolute;
   top: 22px;
-  right: 22px;
+  right: max(22px, var(--safe-r));
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -503,7 +530,7 @@ button {
     right: 0;
     top: calc(var(--nav-h) + 8px);
     /* Same inline padding as the copy sheet, so head and copy start on the same line. */
-    padding: 0 20px;
+    padding: 0 max(20px, var(--safe-r)) 0 max(20px, var(--safe-l));
     text-align: left;
   }
   .detail-head h2 {
@@ -514,7 +541,7 @@ button {
   }
   .detail-close {
     top: 14px;
-    right: 14px;
+    right: max(14px, var(--safe-r));
   }
   .detail-sheet {
     position: absolute;
@@ -526,7 +553,7 @@ button {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     /* Top runway: blocks start below the edge and fade out as they scroll up to it. */
-    padding: 76px 20px 40px;
+    padding: 76px max(20px, var(--safe-r)) 40px max(20px, var(--safe-l));
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
@@ -627,7 +654,7 @@ button {
   .detail-head {
     text-align: left;
     /* Same inline padding as the copy column; extra on the right clears the close button. */
-    padding: 0 72px 0 40px;
+    padding: 0 calc(50px + max(22px, var(--safe-r))) 0 max(40px, var(--safe-l));
   }
   .detail-sheet {
     flex: 1 1 auto;
@@ -637,7 +664,7 @@ button {
     overscroll-behavior: contain;
     /* Runways top and bottom (≥ the 72px fade), so copy is fully visible at rest and fades in and
        out at the column's edges as it scrolls. */
-    padding: 76px 40px 76px;
+    padding: 76px 40px 76px max(40px, var(--safe-l));
     grid-template-columns: 1fr;
     grid-template-areas:
       'left'
@@ -651,10 +678,11 @@ button {
   .detail-stage {
     display: none;
   }
-  /* The hint centres under the product, in the area right of the copy column. */
+  /* The hint centres under the product, in the area right of the copy column (same right edge as
+     the product's area in detailFraming). */
   .detail-overlay .detail-hint {
     left: 40%;
-    right: 0;
+    right: max(24px, var(--safe-r));
   }
 }
 
