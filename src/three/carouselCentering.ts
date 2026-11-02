@@ -8,7 +8,8 @@ const TOGGLE_BLOCK_PX = 54
 /** Mobile: minimum clearance between the label block and the paddle row at the bottom. */
 const PADDLE_CLEARANCE_PX = 16
 
-function cssPx(name: string, fallback: number) {
+/** Reads a length custom property from :root, in CSS px. */
+export function cssPx(name: string, fallback: number) {
   const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name))
   return Number.isFinite(v) ? v : fallback
 }

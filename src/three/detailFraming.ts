@@ -1,6 +1,7 @@
 import { Box3, MathUtils, PerspectiveCamera, Vector3, type Object3D } from 'three'
 import { invalidate } from '@react-three/fiber'
 import { restingBox, restingScreenRect } from './restingBox'
+import { cssPx } from './carouselCentering'
 
 /** At or below this width the details view stacks: headline, product band, then a copy sheet. */
 export const MOBILE_MAX_WIDTH = 768
@@ -88,7 +89,7 @@ function readArea(layout: DetailLayout, viewW: number, viewH: number): Area | nu
     const headBottom = head.offsetTop + head.offsetHeight
     return {
       left: sheet.offsetLeft + sheet.offsetWidth,
-      right: viewW - 24,
+      right: viewW - Math.max(24, cssPx('--safe-r', 0)),
       top: headBottom + 16,
       bottom: viewH - 56,
       maxHeight: Infinity,

@@ -116,6 +116,8 @@ export interface ProductCopy {
   right: CopyBlock[]
   cta: CopyBlock & { actions: string[] }
   footnote: string
+  /** Carousel line under the name: the subline's middle sentence (derived on load, not in the JSON). */
+  tagline: string
 }
 
 export interface CopyDoc {

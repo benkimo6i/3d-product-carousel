@@ -19,7 +19,7 @@ export function CarouselUI() {
       </p>
       <div className="product-label" key={key}>
         <h2>{c.name}</h2>
-        <p>{c.subline.replace(/^[^.]*\.\s*/, '').replace(/\s*From .*$/, '')}</p>
+        <p>{c.tagline}</p>
         <button className="link" onClick={() => openDetail(key)}>
           Explore<span className="visually-hidden"> {c.name}</span>
           <span aria-hidden> &rsaquo;</span>
