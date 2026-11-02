@@ -9,6 +9,9 @@ export function CarouselUI() {
   const c = copy.products[key]
   const visible = mode === 'carousel' && settled
   const position = `${nearest + 1} of ${manifest.carousel.order.length}`
+  const mbp = isMbpSlot(manifest, nearest)
+  // The MacBook Pro title leaves the size out; screen readers still hear the full name.
+  const title = mbp ? c.name.replace(/\s\d+"$/, '') : c.name
 
   return (
     // While details is open the label sits behind the dialog: out of reach entirely.
@@ -18,14 +21,14 @@ export function CarouselUI() {
         {visible ? `${c.name}, ${position}` : ''}
       </p>
       <div className="product-label" key={key}>
-        <h2>{c.name}</h2>
+        <h2>{title}</h2>
         <p>{c.tagline}</p>
         <button className="link" onClick={() => openDetail(key)}>
           Explore<span className="visually-hidden"> {c.name}</span>
           <span aria-hidden> &rsaquo;</span>
         </button>
       </div>
-      {isMbpSlot(manifest, nearest) && <SizeToggle className="stage-toggle" />}
+      {mbp && <SizeToggle className="stage-toggle" />}
     </div>
   )
 }
