@@ -1,0 +1,272 @@
+{
+  "_note": "Placeholder copy for layout only. Prices, specs and claims are not real and must be replaced before anything ships.",
+  "layout": "print-ad: headline + subline on top, 3 feature blocks left, 2 blocks + CTA right, footnote bottom",
+  "products": {
+    "neo": {
+      "name": "MacBook Neo",
+      "headline": "Bright idea.",
+      "subline": "MacBook Neo. Color, power and all-day battery. From $X,XXX*",
+      "left": [
+        {
+          "title": "Made in color",
+          "body": "A finish that turns heads from every angle. Pick the shade that feels like you, and carry it everywhere."
+        },
+        {
+          "title": "All-day battery",
+          "body": "Work, stream and create from morning to night, then keep going. Leave the charger at home."
+        },
+        {
+          "title": "A display that pops",
+          "body": "A vivid, edge-to-edge screen that makes photos, movies and everything in between look their best."
+        }
+      ],
+      "right": [
+        {
+          "title": "Fast where it counts",
+          "body": "Apps launch instantly and everything stays smooth, even with dozens of tabs and projects open at once."
+        },
+        {
+          "title": "Light enough for anywhere",
+          "body": "Thin, quiet and easy to carry, so it goes wherever the day takes you."
+        }
+      ],
+      "cta": {
+        "title": "Make it yours",
+        "body": "Compare models, choose a color and see what fits your workflow.",
+        "actions": [
+          "Buy",
+          "Learn more"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "mbp14": {
+      "name": "MacBook Pro 14\"",
+      "headline": "Pro in every sense.",
+      "subline": "MacBook Pro 14\". Serious performance, compact size. From $X,XXX*",
+      "left": [
+        {
+          "title": "Next-level chip",
+          "body": "Blazing CPU and GPU performance for code, 3D and pro video, without breaking a sweat."
+        },
+        {
+          "title": "Extreme dynamic range",
+          "body": "A brilliant display with deep blacks and dazzling highlights for true-to-life HDR work."
+        },
+        {
+          "title": "Battery that keeps up",
+          "body": "Pro performance whether you're plugged in or not, all day long."
+        }
+      ],
+      "right": [
+        {
+          "title": "Ports for pros",
+          "body": "Connect displays, cameras and drives directly. No dongles, no compromises."
+        },
+        {
+          "title": "Studio-quality sound",
+          "body": "Wide, rich speakers and pro mics that turn any desk into a studio."
+        }
+      ],
+      "cta": {
+        "title": "Choose your size",
+        "body": "Toggle to compare the 14\" and 16\" models side by side.",
+        "actions": [
+          "Buy",
+          "Compare"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "mbp16": {
+      "name": "MacBook Pro 16\"",
+      "headline": "Room to create.",
+      "subline": "MacBook Pro 16\". The biggest canvas, the widest sound. From $X,XXX*",
+      "left": [
+        {
+          "title": "Our largest Pro display",
+          "body": "More room for timelines, canvases and code, with stunning brightness and contrast."
+        },
+        {
+          "title": "Next-level chip",
+          "body": "Sustained performance for the heaviest workloads, hour after hour."
+        },
+        {
+          "title": "Battery that keeps up",
+          "body": "The longest battery life in a MacBook Pro, plugged in or not."
+        }
+      ],
+      "right": [
+        {
+          "title": "Wider speakers",
+          "body": "A larger chassis means a wider soundstage and deeper bass for mixing and playback."
+        },
+        {
+          "title": "Ports for pros",
+          "body": "Everything you need to connect, built right in."
+        }
+      ],
+      "cta": {
+        "title": "Choose your size",
+        "body": "Toggle to compare the 14\" and 16\" models side by side.",
+        "actions": [
+          "Buy",
+          "Compare"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "imac": {
+      "name": "iMac",
+      "headline": "Say hello.",
+      "subline": "iMac. Strikingly thin, all-in-one, in a palette of colors. From $X,XXX*",
+      "left": [
+        {
+          "title": "All-in-one design",
+          "body": "Display, computer and speakers in one remarkably thin piece. Set up in minutes."
+        },
+        {
+          "title": "A stunning display",
+          "body": "A big, bright, color-accurate screen that makes everything look its best."
+        },
+        {
+          "title": "Color that lifts a room",
+          "body": "Seven bright finishes to match your space and your mood."
+        }
+      ],
+      "right": [
+        {
+          "title": "Fast and quiet",
+          "body": "Snappy performance for everyday work and creativity, in near silence."
+        },
+        {
+          "title": "Built-in camera & mics",
+          "body": "Look and sound great on every call, no extra gear required."
+        }
+      ],
+      "cta": {
+        "title": "Find your color",
+        "body": "Explore finishes and configurations to suit your desk.",
+        "actions": [
+          "Buy",
+          "Learn more"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "iphone": {
+      "name": "iPhone 17 Pro",
+      "headline": "Pro, perfected.",
+      "subline": "iPhone 17 Pro. Our most advanced camera and display. From $X,XXX*",
+      "left": [
+        {
+          "title": "Pro camera system",
+          "body": "Three cameras for wide, ultra-wide and telephoto shots, with remarkable detail in any light."
+        },
+        {
+          "title": "Brilliant display",
+          "body": "An always-on, ultra-bright screen that's easy to read even in direct sun."
+        },
+        {
+          "title": "Built to last",
+          "body": "Durable materials and tough glass, ready for everyday life."
+        }
+      ],
+      "right": [
+        {
+          "title": "All-day battery",
+          "body": "Power for photos, video and games that lasts from morning to night."
+        },
+        {
+          "title": "Intelligence built in",
+          "body": "Helpful features that work quietly in the background to save you time."
+        }
+      ],
+      "cta": {
+        "title": "Get yours",
+        "body": "Choose your finish and storage, and trade in your current phone.",
+        "actions": [
+          "Buy",
+          "Learn more"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "watch": {
+      "name": "Apple Watch Ultra 2",
+      "headline": "Go further.",
+      "subline": "Apple Watch Ultra 2. Rugged, capable and made for adventure. From $X,XXX*",
+      "left": [
+        {
+          "title": "Rugged titanium case",
+          "body": "Light, strong and built for the trail, the water and everything between."
+        },
+        {
+          "title": "The brightest display",
+          "body": "Easy to read in full sun, and dims gently at night."
+        },
+        {
+          "title": "Precision GPS",
+          "body": "Accurate location tracking in cities, canyons and open water."
+        }
+      ],
+      "right": [
+        {
+          "title": "Multi-day battery",
+          "body": "Go for days between charges, with low-power modes for longer trips."
+        },
+        {
+          "title": "Health on your wrist",
+          "body": "Advanced sensors that help you understand your body and your training."
+        }
+      ],
+      "cta": {
+        "title": "Pick your band",
+        "body": "Trail, Alpine or Ocean. Find the right fit for your adventure.",
+        "actions": [
+          "Buy",
+          "Learn more"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    },
+    "airpods": {
+      "name": "AirPods",
+      "headline": "Sound, simplified.",
+      "subline": "AirPods. Effortless setup, all-day comfort. From $XXX*",
+      "left": [
+        {
+          "title": "Spatial audio",
+          "body": "Sound that surrounds you, for movies, music and calls that feel more real."
+        },
+        {
+          "title": "All-day comfort",
+          "body": "A contoured design that sits lightly in your ears, hour after hour."
+        },
+        {
+          "title": "Instant pairing",
+          "body": "Open the case near your phone and you're connected in a tap."
+        }
+      ],
+      "right": [
+        {
+          "title": "Long battery life",
+          "body": "Hours of listening per charge, and more in the pocket-sized case."
+        },
+        {
+          "title": "Sweat & water resistant",
+          "body": "Ready for workouts, rainy commutes and everything in between."
+        }
+      ],
+      "cta": {
+        "title": "Hear the difference",
+        "body": "Compare models and find your perfect pair.",
+        "actions": [
+          "Buy",
+          "Learn more"
+        ]
+      },
+      "footnote": "*Placeholder pricing and claims for layout only. Not actual product information."
+    }
+  }
+}
