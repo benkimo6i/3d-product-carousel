@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo } from 'react'
 import { useThree } from '@react-three/fiber'
-import { Mesh, MeshBasicMaterial, type Material, type Object3D } from 'three'
+import { DoubleSide, Mesh, MeshBasicMaterial, type Material, type Object3D } from 'three'
 import { warmUp } from './warmUp'
 import { useModel } from './gltf'
 
@@ -16,7 +16,9 @@ export interface LoadedModel {
 export const DEPTH_PASS_ORDER = 1
 export const FADE_PASS_ORDER = 2
 
-const depthOnly = new MeshBasicMaterial({ colorWrite: false, depthWrite: true, transparent: true })
+// Double-sided like the models' own materials: front-side only, it skipped surfaces whose triangles
+// face away (e.g. parts of the iPhone's front), and the rear cameras showed through them mid-fade.
+const depthOnly = new MeshBasicMaterial({ colorWrite: false, depthWrite: true, transparent: true, side: DoubleSide })
 
 /** Renders a cloned glTF scene with its own materials, so each instance can fade independently. */
 export function Model({ url, onReady }: { url: string; onReady: (m: LoadedModel) => void }) {

@@ -258,7 +258,12 @@ export function Product({ pkey, def, slot }: Props) {
   const setShadowOpen = useCallback((m: MeshBasicMaterial) => (shadowOpen.current = m), [])
   const setShadowClosed = useCallback((m: MeshBasicMaterial) => (shadowClosed.current = m), [])
 
+  // Hidden products (the MacBook Pro size not shown, which sits closed over the visible one's
+  // keyboard) still catch raycasts: let those events pass through to the product behind.
+  const hidden = () => !group.current?.visible
+
   const onClick = (e: ThreeEvent<MouseEvent>) => {
+    if (hidden()) return
     e.stopPropagation()
     const { mode, nearest, settled, detailKey } = useStore.getState()
     if (mode === 'detail') {
@@ -276,6 +281,7 @@ export function Product({ pkey, def, slot }: Props) {
   }
 
   const setCursor = (pointer: boolean) => {
+    if (pointer && hidden()) return
     const { mode, detailKey } = useStore.getState()
     // In details, only a product that does something on click is clickable.
     const clickable = mode === 'carousel' || (mode === 'detail' && !!(def.screen || def.case) && isDetailProduct(pkey, detailKey))
